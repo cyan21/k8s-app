@@ -1,7 +1,7 @@
 Init:
   pipelineName: k8s_project_init
   container:
-    registry: kaivengers-docker.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80
+    registry: kaivengers-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
     repoSource: kaivengers-docker

@@ -10,7 +10,7 @@ BackApp:
     repoSource: kaizoku-grdl
     repoPromotion1: kaizoku-grdl-rc-local
   container:
-    registry: kaizoku-docker.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80
+    registry: kaizoku-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
     image: backapp-gradle-docker
     repoSource: kaizoku-docker
     repoPromotion1: kaizoku-docker-rc-local
