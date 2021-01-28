@@ -1,0 +1,137 @@
+template: true
+valuesFilePath: values.yml  
+
+resources:
+  - name: {{ .Values.InitResources.gitRepo.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.InitResources.gitRepo.gitProvider }}
+      path: {{ .Values.InitResources.gitRepo.path }}
+      branches:
+        include: {{ .Values.InitResources.gitRepo.branches.include }}
+      buildOn:
+         commit: false
+
+  - name: {{ .Values.InitResources.gitRepoDocker.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.InitResources.gitRepoDocker.gitProvider}}
+      path: {{ .Values.InitResources.gitRepoDocker.path }}
+      branches:
+        include: {{ .Values.InitResources.gitRepoDocker.branches.include }}
+      files:
+        include: {{ .Values.InitResources.gitRepoDocker.files.include }}
+
+  - name: {{ .Values.InitResources.gitRepoHelm.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.InitResources.gitRepoHelm.gitProvider }}
+      path: {{ .Values.InitResources.gitRepoHelm.path }}
+      branches:
+        include: {{ .Values.InitResources.gitRepoHelm.branches.include }}
+      files:
+        include: {{ .Values.InitResources.gitRepoHelm.files.include }}
+
+  - name:  {{ .Values.InitResources.buildInfoContainer.resourceName }}
+    type: BuildInfo 
+    configuration:
+      sourceArtifactory: {{ .Values.Init.artifactoryIntegration }}
+      buildName: {{ .Values.InitResources.buildInfoContainer.name }}
+      buildNumber: ${run_number} 
+      
+  - name: {{ .Values.InitResources.buildInfoHelm.resourceName }}
+    type: BuildInfo 
+    configuration:
+      sourceArtifactory: {{ .Values.Init.artifactoryIntegration }}
+      buildName: {{ .Values.InitResources.buildInfoHelm.name }}
+      buildNumber: ${run_number} 
+  
+  - name: {{ .Values.InitResources.chart.resourceName }}
+    type: HelmChart
+    configuration:
+      sourceArtifactory: {{ .Values.Init.artifactoryIntegration }}
+      repository: {{ .Values.InitResources.chart.repo }}
+      chart: {{ .Values.InitResources.chart.name }}
+      version: {{ .Values.InitResources.chart.version }}
+
+
+pipelines:
+## INIT PIPELINE
+  - name: {{ .Values.Init.pipelineName }}
+    steps:
+      - name: create_resources
+        type: Bash
+        configuration:
+          affinityGroup: helm
+          runtime:
+            type: host
+          inputResources:
+            - name: {{ .Values.InitResources.gitRepo.name }}
+          integrations:
+            - name: {{ .Values.Init.artifactoryIntegration }}
+        execution:
+          onStart:
+            - sudo mkdir -p /etc/docker 
+            - > 
+              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.Init.container.registry }}\"]}" > /etc/docker/daemon.json
+            - sudo systemctl restart docker
+            - sudo cat /etc/docker/daemon.json
+          onExecute:
+            - cd ${res_{{ .Values.InitResources.gitRepo.name }}_resourcePath}/chart/CI/jfrog
+            - ls -l && chmod +x init.sh
+            - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url/%artifactory/} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey}
+      
+      - name: {{ .Values.InitSteps.publishHelm.name }}
+        type: HelmPublish
+        configuration:
+          affinityGroup: helm
+          helmVersion: 3
+          chartPath: {{ .Values.InitSteps.publishHelm.path }}
+          lint: {{ .Values.InitSteps.publishHelm.lint }}
+          autoPublishBuildInfo: {{ .Values.InitSteps.publishHelm.autoPublishBuildInfo }}
+          inputResources:
+            - name: {{ .Values.InitResources.gitRepoHelm.name }}
+          inputSteps:
+            - name: create_resources
+          integrations:
+            - name: {{ .Values.Init.artifactoryIntegration }}
+          outputResources:
+            - name: {{ .Values.InitResources.chart.resourceName }}
+            - name: {{ .Values.InitResources.buildInfoContainer.resourceName }}
+        execution:
+          onStart:
+            - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
+            - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
+            - helm3 version
+            - cat ${res_{{ .Values.InitResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
+
+# WORKAROUND FOR HELM DEPLOY WHICH REQUIRES A NEWER JFROG CLI VERSION   
+      - name: {{ .Values.InitSteps.dockerBuild.name }}
+        type: DockerBuild
+        configuration:
+          affinityGroup: helm
+          dockerFileName: {{ .Values.InitSteps.dockerBuild.dockerFileName }}
+          dockerFileLocation: {{ .Values.InitSteps.dockerBuild.dockerFileLocation }}
+          dockerImageName: ${envVarDockerRegistry}/${envVarDockerImageName}
+          dockerImageTag: ${envVarBaseImageTag}
+          inputSteps:
+            - name: {{ .Values.InitSteps.publishHelm.name }}
+          inputResources:
+            - name: {{ .Values.InitResources.gitRepoDocker.name }}
+          integrations:
+            - name: {{ .Values.Init.artifactoryIntegration }}
+
+      - name: {{ .Values.InitSteps.dockerPush.name }}
+        type: DockerPush
+        configuration:
+          affinityGroup: helm
+          targetRepository: {{ .Values.Init.container.repoSource }}
+          autoPublishBuildInfo:  {{ .Values.InitSteps.dockerPush.autoPublishBuildInfo }}
+          forceXrayScan:  {{ .Values.InitSteps.dockerPush.forceXrayScan }}
+          inputSteps:
+            - name: {{ .Values.InitSteps.dockerBuild.name }}
+          integrations:
+            - name: {{ .Values.Init.artifactoryIntegration }}
+          outputResources:
+            - name: {{ .Values.InitResources.buildInfoHelm.resourceName }}
+

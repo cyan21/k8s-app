@@ -1,0 +1,66 @@
+Init:
+  pipelineName: k8s_project_init
+  container:
+    registry: kaivengers-docker.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80
+    image: jfrog/pipelines-u18node
+    tag: 10.21.0-jfrog
+    repoSource: kaivengers-docker
+    # repoPromotion1: kaizoku-docker-rc-local
+  chart:
+    repo: kaivengers-helm
+    name: myapp
+    version: 1.0.0
+  artifactoryIntegration: artifactory_eu
+
+Chart:
+  pipelineName:
+
+InitResources:
+  gitRepo:
+    name: src_code_k8s_app
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: jfrog-ode
+  gitRepoDocker:
+    name: src_dockerfile_base_image_helm
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: jfrog-ode
+    files:
+      include: ^chart\/CI\/jfrog\/Dockerfile
+  gitRepoHelm:
+    name: src_code_k8s_helm
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: jfrog-ode
+    files:
+      include: ^chart\/.+
+  buildInfoContainer:
+    resourceName: bi_base_image_helm
+    name: helm_base_image
+  buildInfoHelm:
+    resourceName: bi_hc_my_app
+    name: helm_chart_myapp
+  chart:
+    resourceName: hc_my_app
+    name: myapp
+    version: 1.0.0
+    repo: kaivengers-helm
+
+InitSteps:
+  publishHelm:
+    name: publish_helm_chart
+    path: chart/content/
+    lint: true
+    autoPublishBuildInfo: true
+  dockerBuild:
+    name: build_helm_base_image
+    dockerFileName: Dockerfile
+    dockerFileLocation: chart/CI/jfrog/
+  dockerPush:
+    name: publish_helm_base_image
+    autoPublishBuildInfo: true
+    forceXrayScan: false

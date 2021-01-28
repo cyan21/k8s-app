@@ -89,7 +89,6 @@ BackAppContainerSteps:
   dockerPush:
     name: publish_k8s_backapp_gradle_docker
     autoPublishBuildInfo: true
-    artifactoryTargetRepoName: kaizoku-docker-dev-local
   xray:
     name: scan_k8s_backapp_gradle_docker
   promotion:
