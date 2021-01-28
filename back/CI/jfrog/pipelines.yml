@@ -286,7 +286,7 @@ pipelines:
                 registry: {{ .Values.BackApp.artifactoryIntegration }}
                 name: "{{ .Values.BackApp.container.registry }}/{{ .Values.BackAppContainerDeploySteps.helmDeploy.container.image }}"
                 tag: {{ .Values.BackAppContainerDeploySteps.helmDeploy.container.tag }}
-                sourceRepository: {{ .Values.BackApp.container.registry }}
+                sourceRepository: {{ .Values.BackApp.container.repoSource }}
           inputSteps:
             - name: setup_env
           integrations:
