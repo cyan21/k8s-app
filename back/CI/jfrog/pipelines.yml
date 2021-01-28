@@ -60,7 +60,7 @@ resources:
       buildName: {{ .Values.BackAppContainerResources.buildInfo.name }}
       buildNumber: ${run_number}
 
-  - name: {{ .Values.BackAppContainerResources.buildInfoPromotion.name }}
+  - name: {{ .Values.BackAppContainerResources.buildInfoPromotion.resourceName }}
     type: BuildInfo
     configuration:
       sourceArtifactory: {{ .Values.BackApp.BackApp.artifactoryIntegration }}
