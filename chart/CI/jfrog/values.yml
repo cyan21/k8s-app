@@ -39,7 +39,7 @@ InitResources:
     branches:
       include: jfrog-ode
     files:
-      include: ^chart\/.+
+      include: ^chart\/content\/.+
   buildInfoContainer:
     resourceName: bi_base_image_helm
     name: helm_base_image
