@@ -8,7 +8,7 @@
         "resources": [
             {
                 "type": "repository",
-                "name": "avengers-dev-npm-local",
+                "name": "avengers-npm-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -19,7 +19,7 @@
             },
             {
                 "type": "repository",
-                "name": "avengers-rc-npm-local",
+                "name": "avengers-npm-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -30,7 +30,7 @@
             },
             {
                 "type": "repository",
-                "name": "avengers-dev-docker-local",
+                "name": "avengers-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -41,7 +41,7 @@
             },
             {
                 "type": "repository",
-                "name": "avengers-rc-docker-local",
+                "name": "avengers-docker-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {

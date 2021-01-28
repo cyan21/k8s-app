@@ -1,35 +1,35 @@
 localRepositories:   
-  avengers-dev-npm-local:
+  avengers-npm-dev-local:
     type: npm
     repoLayout: npm-default 
     xray:   
       enabled: true
-  avengers-rc-npm-local:
+  avengers-npm-rc-local:
     type: npm
     repoLayout: npm-default 
     xray:   
       enabled: true
-  avengers-dev-generic-local:
+  avengers-generic-dev-local:
     type: generic
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-rc-generic-local:
+  avengers-generic-rc-local:
     type: generic
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-dev-docker-local:
+  avengers-docker-dev-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-rc-docker-local:
+  avengers-docker-rc-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-release-docker-local:
+  avengers-docker-release-local:
     type: docker
     repoLayout: simple-default 
     xray:   
@@ -62,26 +62,26 @@ virtualRepositories:
     type: npm
     repoLayout: npm-default 
     repositories:   
-      - avengers-dev-npm-local
-      - avengers-rc-npm-local
+      - avengers-npm-dev-local
+      - avengers-npm-rc-local
       - avengers-npmjs-remote
-    defaultDeploymentRepo: avengers-dev-npm-local
+    defaultDeploymentRepo: avengers-npm-dev-local
   avengers-generic:
     type: generic
     repoLayout: simple-default 
     repositories:   
-      - avengers-dev-generic-local
-      - avengers-rc-generic-local
-    defaultDeploymentRepo: avengers-dev-generic-local
+      - avengers-generic-dev-local
+      - avengers-generic-rc-local
+    defaultDeploymentRepo: avengers-generic-dev-local
   avengers-docker:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - avengers-dev-docker-local
-      - avengers-rc-docker-local
-      - avengers-release-docker-local
+      - avengers-docker-dev-local
+      - avengers-docker-rc-local
+      - avengers-docker-release-local
       - avengers-dockerhub-remote
       - avengers-bintray-remote
-      - kaivengers-release-docker-local
-    defaultDeploymentRepo: avengers-dev-docker-local
+      - kaivengers-docker-release-local
+    defaultDeploymentRepo: avengers-docker-dev-local

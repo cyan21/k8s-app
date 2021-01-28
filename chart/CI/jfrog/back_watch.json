@@ -9,7 +9,7 @@
         "resources": [
             {
                 "type": "repository",
-                "name": "kaizoku-dev-grdl-local",
+                "name": "kaizoku-grdl-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -20,7 +20,7 @@
             },
             {
                 "type": "repository",
-                "name": "kaizoku-rc-grdl-local",
+                "name": "kaizoku-grdl-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -31,7 +31,29 @@
             },
             {
                 "type": "repository",
-                "name": "kaizoku-rc-docker-local",
+                "name": "kaizoku-docker-dev-local",
+                "bin_mgr_id": "unused",
+                "filters": [
+                    {
+                        "type": "regex",
+                        "value": ".*"
+                    }
+                ]
+            },
+            {
+                "type": "repository",
+                "name": "kaizoku-docker-rc-local",
+                "bin_mgr_id": "unused",
+                "filters": [
+                    {
+                        "type": "regex",
+                        "value": ".*"
+                    }
+                ]
+            },
+            {
+                "type": "repository",
+                "name": "kaizoku-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {

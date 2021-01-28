@@ -1,11 +1,11 @@
 localRepositories:   
-  kaivengers-release-docker-local:
+  kaivengers-docker-release-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaivengers-dev-helm-local:
+  kaivengers-helm-dev-local:
     type: helm
     repoLayout: simple-default 
     xray:   
@@ -39,14 +39,14 @@ virtualRepositories:
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - kaivengers-release-docker-local
+      - kaivengers-docker-release-local
       - kaivengers-dockerhub-remote
       - kaivengers-bintray-remote
-    defaultDeploymentRepo: kaivengers-release-docker-local
+    defaultDeploymentRepo: kaivengers-docker-release-local
   kaivengers-helm:
     type: helm
     repoLayout: simple-default 
     repositories:   
-      - kaivengers-dev-helm-local
+      - kaivengers-helm-dev-local
       - kaivengers-chartcenter-remote
-    defaultDeploymentRepo: kaivengers-dev-helm-local
+    defaultDeploymentRepo: kaivengers-helm-dev-local

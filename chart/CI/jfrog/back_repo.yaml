@@ -1,38 +1,38 @@
 localRepositories:   
-  kaizoku-dev-grdl-local:
+  kaizoku-grdl-dev-local:
     type: gradle
     repoLayout: maven-2-default 
     xray:   
       enabled: true
-  kaizoku-rc-grdl-local:
+  kaizoku-grdl-rc-local:
     type: gradle
     repoLayout: maven-2-default 
     xray:   
       enabled: true
-  kaizoku-dev-docker-local:
+  kaizoku-docker-dev-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaizoku-rc-docker-local:
+  kaizoku-docker-rc-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaizoku-release-docker-local:
+  kaizoku-docker-release-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaivengers-dev-helm-local:
+  kaivengers-helm-dev-local:
     type: helm
     repoLayout: simple-default 
     xray:   
       enabled: false
-  kaivengers-release-docker-local:
+  kaivengers-docker-release-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
@@ -73,18 +73,18 @@ virtualRepositories:
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - kaizoku-dev-docker-local
-      - kaizoku-rc-docker-local
-      - kaizoku-release-docker-local
+      - kaizoku-docker-dev-local
+      - kaizoku-docker-rc-local
+      - kaizoku-docker-release-local
       - kaizoku-dockerhub-remote
       - kaizoku-bintray-remote
-      - kaivengers-release-docker-local
-    defaultDeploymentRepo: kaizoku-dev-docker-local
+      - kaivengers-docker-release-local
+    defaultDeploymentRepo: kaizoku-docker-dev-local
   kaizoku-grdl:
     type: gradle
     repoLayout: maven-2-default 
     repositories:   
-      - kaizoku-dev-grdl-local
-      - kaizoku-rc-grdl-local
+      - kaizoku-grdl-dev-local
+      - kaizoku-grdl-rc-local
       - kaizoku-jcenter-grdl-remote
-    defaultDeploymentRepo: kaizoku-dev-grdl-local
+    defaultDeploymentRepo: kaizoku-grdl-dev-local
