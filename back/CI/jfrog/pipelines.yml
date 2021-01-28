@@ -2,7 +2,6 @@ template: true
 valuesFilePath: values.yml  
 
 resources:
-
 # gradle PIPELINE
   - name: {{ .Values.BackAppGradleResources.gitRepo.name }}
     type: GitRepo
@@ -50,25 +49,25 @@ resources:
     type: FileSpec
     configuration:
       sourceArtifactory: {{ .Values.BackApp.artifactoryIntegration }}
-      pattern: "{{ .Values.BackAppGradleResources.buildInfoPromotion.repo }}/**/{{ .Values.BackAppGradleResources.fileSpec.appName }}-${runVarAppVersion}.jar"
-      target: "{{ .Values.BackAppGradleResources.fileSpec.appName }}.jar"
-      flat: {{ .Values.BackAppGradleResources.fileSpec.flat }}
+      pattern: "{{ .Values.BackAppGradleResources.buildInfoPromotion.repo }}/**/{{ .Values.BackAppContainerResources.fileSpec.appName }}-${runVarAppVersion}.jar"
+      target: "{{ .Values.BackAppContainerResources.fileSpec.appName }}.jar"
+      flat: {{ .Values.BackAppContainerResources.fileSpec.flat }}
 
-  - name: {{ .Values.BackAppGradleResources.buildInfo.resourceName }}
+  - name: {{ .Values.BackAppContainerResources.buildInfo.resourceName }}
     type: BuildInfo
     configuration:
       sourceArtifactory: {{ .Values.BackApp.artifactoryIntegration }}
-      buildName: {{ .Values.BackAppGradleResources.buildInfo.name }}
+      buildName: {{ .Values.BackAppContainerResources.buildInfo.name }}
       buildNumber: ${run_number}
 
-  - name: {{ .Values.BackAppGradleResources.buildInfoPromotion.name }}
+  - name: {{ .Values.BackAppContainerResources.buildInfoPromotion.name }}
     type: BuildInfo
     configuration:
       sourceArtifactory: {{ .Values.BackApp.BackApp.artifactoryIntegration }}
-      buildName: {{ .Values.BackAppGradleResources.buildInfo.name }}
+      buildName: {{ .Values.BackAppContainerResources.buildInfo.name }}
       buildNumber: ${run_number}
 
-  - name: {{ .Values.BackAppGradleResources.propertyBag.name }}
+  - name: {{ .Values.BackAppContainerResources.propertyBag.name }}
     type: PropertyBag
     configuration:
       newTag: XXX
@@ -80,12 +79,12 @@ resources:
       gitProvider: {{ .Values.BackAppContainerDeployResources.gitRepo.gitProvider }}
       path: {{ .Values.BackAppContainerDeployResources.gitRepo.path }}
       files:
-        include: {{ .Values.BackAppContainerDeployResources.gitRepo.file.include }}
+        include: {{ .Values.BackAppContainerDeployResources.gitRepo.files.include }}
 
   - name:  {{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}
     type: HelmChart
     configuration:
-      sourceArtifactory: {{ .Values.ArtifactoryIntegration }}
+      sourceArtifactory: {{ .Values.BackApp.ArtifactoryIntegration }}
       repository: {{ .Values.BackAppContainerDeployResources.helmChart.repo }}
       chart: {{ .Values.BackAppContainerDeployResources.helmChart.name }}
       version: {{ .Values.BackAppContainerDeployResources.helmChart.version }}
@@ -206,7 +205,7 @@ pipelines:
         type: DockerPush
         configuration:
           affinityGroup: together
-          targetRepository: {{ .Values.BackAppContainerSteps.dockerPush.artifactoryTargetRepoName }}
+          targetRepository: {{ .Values.BackApp.container.repoSource }}
           autoPublishBuildInfo: {{ .Values.BackAppContainerSteps.dockerPush.autoPublishBuildInfo }}
           inputSteps:
             - name: {{ .Values.BackAppContainerSteps.dockerBuild.name }}
@@ -294,7 +293,7 @@ pipelines:
           integrations:
             - name: {{ .Values.BackApp.k8sIntegration }}
           inputResources:
-            - name: {{ .Values.BackAppContainerResources.helmChart.resourceName }}
+            - name: {{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}
           releaseName: my-super-app
           flags: "--debug --install --namespace {{ .Values.BackApp.k8sNamespace }} --cleanup-on-fail --set images.back.tag=${runVarNewTag} --set images.back.repository={{ .Values.BackApp.container.registry }}/{{ .Values.BackApp.container.image }}"
           valueFilePaths:
@@ -302,10 +301,10 @@ pipelines:
         execution:
           onStart:
             - echo ${runVarNewTag}
-            - echo ${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_chart}
-            - echo ${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_version}
-            - add_run_variables runVarChartName=${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_chart}
-            - add_run_variables runVarChartVersion=${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_version}
+            - echo ${res_{{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}_chart}
+            - echo ${res_{{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}_version}
+            - add_run_variables runVarChartName=${res_{{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}_chart}
+            - add_run_variables runVarChartVersion=${res_{{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}_version}
 
       - name: {{ .Values.BackAppContainerDeploySteps.testing.name }}
         type: Bash
