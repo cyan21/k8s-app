@@ -22,6 +22,8 @@ InitResources:
     path: cyan21/k8s-app
     branches:
       include: jfrog-ode
+    files:
+      include: ^chart\/CI\/jfrog\/.+
   gitRepoDocker:
     name: src_dockerfile_base_image_helm
     gitProvider: yann_github

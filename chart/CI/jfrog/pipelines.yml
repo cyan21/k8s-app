@@ -9,6 +9,8 @@ resources:
       path: {{ .Values.InitResources.gitRepo.path }}
       branches:
         include: {{ .Values.InitResources.gitRepo.branches.include }}
+      files: 
+        include: {{ .Values.InitResources.gitRepo.files.include }}
       buildOn:
          commit: false
 
@@ -79,6 +81,8 @@ pipelines:
           onExecute:
             - cd ${res_{{ .Values.InitResources.gitRepo.name }}_resourcePath}/chart/CI/jfrog
             - ls -l && chmod +x init.sh
+            - echo ${res_{{ .Values.InitResources.gitRepo.name }}_brancheName
+            - git branch
             - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url/%artifactory/} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey}
       
       - name: {{ .Values.InitSteps.publishHelm.name }}
