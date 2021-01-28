@@ -118,7 +118,7 @@ pipelines:
           affinityGroup: helm
           dockerFileName: {{ .Values.InitSteps.dockerBuild.dockerFileName }}
           dockerFileLocation: {{ .Values.InitSteps.dockerBuild.dockerFileLocation }}
-          dockerImageName: {{ .Values.Init.container.registry }}/{{ .Values.Init.container.image }}
+          dockerImageName: "{{ .Values.Init.container.registry }}/{{ .Values.Init.container.image }}"
           dockerImageTag: {{ .Values.Init.container.tag }}
           inputSteps:
             - name: {{ .Values.InitSteps.publishHelm.name }}
