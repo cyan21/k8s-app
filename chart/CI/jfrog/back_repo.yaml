@@ -27,17 +27,17 @@ localRepositories:
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaivengers-helm-dev-local:
-    type: helm
-    repoLayout: simple-default 
-    xray:   
-      enabled: false
-  kaivengers-docker-release-local:
-    type: docker
-    dockerApiVersion: V2
-    repoLayout: simple-default 
-    xray:   
-      enabled: true
+  # kaivengers-helm-dev-local:
+  #   type: helm
+  #   repoLayout: simple-default 
+  #   xray:   
+  #     enabled: false
+  # kaivengers-docker-release-local:
+  #   type: docker
+  #   dockerApiVersion: V2
+  #   repoLayout: simple-default 
+  #   xray:   
+  #     enabled: true
 remoteRepositories: 
   kaizoku-jcenter-grdl-remote:
     type: gradle 

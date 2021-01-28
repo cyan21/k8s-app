@@ -28,6 +28,11 @@ fi
 creds="-u$ADMIN_USER:$ADMIN_PASS"
 
 # create repo
+echo "[ARTIFACTORY] creating repositories for chart..."
+curl -XPATCH $creds \
+    -H "Content-Type: application/yaml" -T repo.yaml \
+    $JPD_URL/artifactory/api/system/configuration 
+    
 echo "[ARTIFACTORY] creating repositories for backend..."
 curl -XPATCH $creds \
     -H "Content-Type: application/yaml" -T back_repo.yaml \
@@ -36,11 +41,6 @@ curl -XPATCH $creds \
 echo "[ARTIFACTORY] creating repositories for frontend..."
 curl -XPATCH $creds \
     -H "Content-Type: application/yaml" -T front_repo.yaml \
-    $JPD_URL/artifactory/api/system/configuration 
-
-echo "[ARTIFACTORY] creating repositories for chart..."
-curl -XPATCH $creds \
-    -H "Content-Type: application/yaml" -T repo.yaml \
     $JPD_URL/artifactory/api/system/configuration 
 
 # index build
