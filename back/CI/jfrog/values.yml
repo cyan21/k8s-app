@@ -1,0 +1,130 @@
+BackApp:
+  pipelineName: k8s_backapp_gradle
+  pipelineContainerName: k8s_backapp_gradle_docker
+  pipelineDeployName: k8s_backapp_gradle_deployment
+  projectName: kaizoku
+  artifactoryIntegration: artifactory_eu
+  k8sIntegration: yann_k8s
+  k8sNamespace: kaivengers
+  gradle:
+    repoSource: kaizoku-grdl
+    repoPromotion1: kaizoku-grdl-rc-local
+  container:
+    registry: kaizoku-docker.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80
+    image: backapp-gradle-docker
+    repoSource: kaizoku-docker
+    repoPromotion1: kaizoku-docker-rc-local
+    repoPromotion2: kaizoku-docker-release-local
+
+##########################################
+## Gradle Pipeline
+##########################################
+
+BackAppGradleResources:
+  gitRepo:
+    name: src_code_k8s_backapp_gradle
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: 'jfrog-ode'
+    files:
+      exclude: '^back\/CI\/.+'
+      include: '^back\/.+'
+  buildInfo:
+    resourceName: bi_k8s_backapp_gradle
+    name: k8s_backapp_gradle
+  buildInfoPromotion:
+    resourceName: bi_k8s_backapp_gradle_promoted_staging
+  propertyBag: 
+    name: pb_k8s_backapp_gradle
+
+BackAppGradleSteps:
+  gradleBuild:
+    name: build_k8s_backapp_gradle
+    command: "clean build artifactoryPublish -b build.gradle --stacktrace"
+    sourceLocation:       back/src/gs-rest-service
+    configFileLocation:   .
+    configFileName:       gradle-art-config 
+    forceXrayScan:        false
+    autoPublishBuildInfo: true
+  xray:
+    name: scan_bi_k8s_backapp_gradle
+  promotion:
+    name: promote_bi_k8s_backapp_gradle
+    includeDependencies: false
+    status: SANDBOX_OK
+    comment: Unit testing and Xray scan passed succesfully
+    copy: false
+
+##########################################
+## CONTAINER PIPELINE
+##########################################
+
+BackAppContainerResources:
+  gitRepo:
+    name: src_dockerfile_k8s_backapp_gradle
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: 'jfrog-ode'
+    files:
+      include: '^back\/CI\/Docker\/.+'
+  fileSpec:
+    name: fs_backapp_gradle_exec
+    appName: rest-service 
+    flat: true
+  buildInfo:
+    resourceName: bi_k8s_backapp_gradle_docker
+    name: k8s_backapp_gradle_docker
+  buildInfoPromotion:
+    resourceName: bi_k8s_backapp_gradle_docker_promoted_staging
+  propertyBag: 
+    name: pb_k8s_backapp_gradle_docker
+
+BackAppContainerSteps:
+  dockerBuild:
+    name: build_k8s_backapp_gradle_docker
+    dockerFileName: jfrog-Dockerfile
+    dockerFileLocation: back/CI/Docker/
+  dockerPush:
+    name: publish_k8s_backapp_gradle_docker
+    autoPublishBuildInfo: true
+    artifactoryTargetRepoName: kaizoku-docker-dev-local
+  xray:
+    name: scan_k8s_backapp_gradle_docker
+  promotion:
+    name: promote_bi_k8s_backapp_gradle_docker
+    includeDependencies: false
+    status: SCAN_OK
+    comment: Xray scan OK 
+    copy: false
+
+##########################################
+## K8S PIPELINE
+##########################################
+
+BackAppContainerDeployResources:
+  gitRepo:
+    name: src_code_k8s_backapp_chart
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: 'jfrog-ode'
+    files:
+      include: '^chart\/.+'
+  helmChart:
+    resourceName: hc_my_app_backapp_gradle
+    repo: kaivengers-helm
+    name: myapp
+    version: 1.0.0
+    
+BackAppContainerDeploySteps:
+  helmDeploy:
+    name: deploy_helm_chart
+    container: # workaround to make Helm V3 to work
+      image: jfrog/pipelines-u18node
+      tag: 10.21.0-jfrog
+  testing:
+    name: run_app_test
+  promotion:
+    name: promote_b8s_backapp_gradle_docker_image

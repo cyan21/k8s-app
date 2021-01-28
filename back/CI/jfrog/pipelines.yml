@@ -1,0 +1,344 @@
+template: true
+valuesFilePath: values.yml  
+
+resources:
+
+# gradle PIPELINE
+  - name: {{ .Values.BackAppGradleResources.gitRepo.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.BackAppGradleResources.gitRepo.gitProvider }}
+      path: {{ .Values.BackAppGradleResources.gitRepo.path }}
+      branches:
+        include: {{ .Values.BackAppGradleResources.gitRepo.branches.include }}
+      files:
+        include: {{ .Values.BackAppGradleResources.gitRepo.files.include }}
+        exclude: {{ .Values.BackAppGradleResources.gitRepo.files.exclude }}
+
+  # Build info for the published gradle App
+  - name: {{ .Values.BackAppGradleResources.buildInfo.resourceName }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.BackApp.artifactoryIntegration }}
+      buildName: {{ .Values.BackAppGradleResources.buildInfo.name }}
+      buildNumber: ${run_number}
+  
+  - name: {{ .Values.BackAppGradleResources.buildInfoPromotion.resourceName }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.BackApp.artifactoryIntegration }}
+      buildName: {{ .Values.BackAppGradleResources.buildInfo.name }}
+      buildNumber: ${run_number}
+  
+  - name: {{ .Values.BackAppGradleResources.propertyBag.name }}
+    type: PropertyBag
+    configuration:
+      biNumber: XXX
+
+# DOCKER PIPELINE
+  - name: {{ .Values.BackAppContainerResources.gitRepo.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.BackAppContainerResources.gitRepo.gitProvider }}
+      path: {{ .Values.BackAppContainerResources.gitRepo.path }}
+      branches:
+        include: {{ .Values.BackAppContainerResources.gitRepo.branches.include }}
+      files:
+        include: {{ .Values.BackAppContainerResources.gitRepo.files.include }}
+
+  - name: {{ .Values.BackAppContainerResources.fileSpec.name }}
+    type: FileSpec
+    configuration:
+      sourceArtifactory: {{ .Values.BackApp.artifactoryIntegration }}
+      pattern: "{{ .Values.BackAppGradleResources.buildInfoPromotion.repo }}/**/{{ .Values.BackAppGradleResources.fileSpec.appName }}-${runVarAppVersion}.jar"
+      target: "{{ .Values.BackAppGradleResources.fileSpec.appName }}.jar"
+      flat: {{ .Values.BackAppGradleResources.fileSpec.flat }}
+
+  - name: {{ .Values.BackAppGradleResources.buildInfo.resourceName }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.BackApp.artifactoryIntegration }}
+      buildName: {{ .Values.BackAppGradleResources.buildInfo.name }}
+      buildNumber: ${run_number}
+
+  - name: {{ .Values.BackAppGradleResources.buildInfoPromotion.name }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.BackApp.BackApp.artifactoryIntegration }}
+      buildName: {{ .Values.BackAppGradleResources.buildInfo.name }}
+      buildNumber: ${run_number}
+
+  - name: {{ .Values.BackAppGradleResources.propertyBag.name }}
+    type: PropertyBag
+    configuration:
+      newTag: XXX
+
+# HELM PIPELINE
+  - name: {{ .Values.BackAppContainerDeployResources.gitRepo.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.BackAppContainerDeployResources.gitRepo.gitProvider }}
+      path: {{ .Values.BackAppContainerDeployResources.gitRepo.path }}
+      files:
+        include: {{ .Values.BackAppContainerDeployResources.gitRepo.file.include }}
+
+  - name:  {{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}
+    type: HelmChart
+    configuration:
+      sourceArtifactory: {{ .Values.ArtifactoryIntegration }}
+      repository: {{ .Values.BackAppContainerDeployResources.helmChart.repo }}
+      chart: {{ .Values.BackAppContainerDeployResources.helmChart.name }}
+      version: {{ .Values.BackAppContainerDeployResources.helmChart.version }}
+
+
+pipelines:
+  - name: {{ .Values.BackApp.pipelineName }}
+    steps:
+      - name: {{ .Values.BackAppGradleSteps.gradleBuild.name }}
+        type: GradleBuild
+        configuration: 
+          environmentVariables:
+            JFROG_CLI_LOG_LEVEL: DEBUG
+          gradleCommand:  {{ .Values.BackAppGradleSteps.gradleBuild.command }}
+          sourceLocation: {{ .Values.BackAppGradleSteps.gradleBuild.sourceLocation }}
+          configFileLocation: {{ .Values.BackAppGradleSteps.gradleBuild.configFileLocation }}
+          configFileName: {{ .Values.BackAppGradleSteps.gradleBuild.configFileName }}      
+          forceXrayScan: {{ .Values.BackAppGradleSteps.gradleBuild.forceXrayScan }}       
+          autoPublishBuildInfo: {{ .Values.BackAppGradleSteps.gradleBuild.autoPublishBuildInfo }}
+          inputResources:
+            - name: {{ .Values.BackAppGradleResources.gitRepo.name }}
+          integrations:
+            - name: {{ .Values.BackApp.artifactoryIntegration }}
+          outputResources:
+            - name: {{ .Values.BackAppGradleResources.buildInfo.resourceName }}
+        execution:
+          onStart:
+            - jfrog --version
+      #       - cli_path=$(dirname "$(which jfrog)") && echo $cli_path
+      #       - curl -fL https://getcli.jfrog.io | sh && ls -l           
+      #       - mv ./jfrog "$cli_path/" && ls -l "$cli_path/jfrog"  && jfrog --version
+            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.BackApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.BackAppGradleResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_branchName}"
+          onSuccess:
+            - add_run_variables runVarAppVersion=`sed -n "s/currentVersion=\(.*\)/\1/p" ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/src/gs-rest-service/gradle.properties`
+            - add_run_variables runVarGitCommit=${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_commitSha}
+            - echo $runVarAppVersion
+            - echo $runVarGitCommit
+            - jfrog rt sp --build=${res_{{ .Values.BackAppGradleResources.buildInfo.resourceName }}_buildName}/${run_number}  --exclusions="*.pom;*src*" {{ .Values.BackApp.gradle.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.BackApp.projectName }}"
+
+
+      - name: {{ .Values.BackAppGradleResources.xray.name }}
+        type: XrayScan
+        configuration:
+          failOnScan: false
+          inputResources:
+            - name: {{ .Values.BackAppGradleResources.buildInfo.resourceName }}
+              trigger: true
+
+      - name: {{ .Values.BackAppGradleSteps.promotion.name }}
+        type: PromoteBuild
+        configuration:
+          targetRepository: {{ .Values.BackApp.gradle.repoPromotion1 }}
+          includeDependencies: {{ .Values.BackAppGradleSteps.promotion.includeDependencies }}
+          status: {{ .Values.BackAppGradleSteps.promotion.status }}
+          comment: {{ .Values.BackAppGradleSteps.promotion.comment }}
+          copy: {{ .Values.BackAppGradleSteps.promotion.copy }}
+          inputResources:
+            - name: {{ .Values.BackAppGradleResources.buildInfo.resourceName }}
+              trigger: true
+          inputSteps:
+            - name: {{ .Values.BackAppGradleSteps.xray.name }}
+          outputResources:
+            - name: {{ .Values.BackAppGradleResources.buildInfoPromotion.resourceName }}
+            - name: {{ .Values.BackAppGradleResources.propertyBag.name }}
+        execution:  
+          onStart:
+            - echo ${res_{{ .Values.BackAppGradleResources.buildInfo.resourceName }}_buildName} 
+            - echo ${res_{{ .Values.BackAppGradleResources.buildInfo.resourceName }}_buildNumber} 
+          onSuccess:
+            - write_output {{ .Values.BackAppGradleResources.propertyBag.name }} appVersion=${runVarAppVersion}
+            - write_output {{ .Values.BackAppGradleResources.propertyBag.name }} appCommitSHA=${runVarGitCommit}
+
+  - name: {{ .Values.BackApp.pipelineContainerName }}
+    steps:
+      - name: setup_env
+        type: Bash
+        configuration:
+          affinityGroup: together
+          runtime:
+            type: host
+          inputResources:
+            - name: {{ .Values.BackAppGradleResources.propertyBag.name }}
+        execution:
+          onExecute:
+            - sudo mkdir -p /etc/docker 
+            - > 
+              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackAppContainerSteps.dockerBuild.registry }}\"]}" > /etc/docker/daemon.json
+            - sudo systemctl restart docker
+            - sudo cat /etc/docker/daemon.json
+            - add_run_variables runVarAppVersion=${res_{{ .Values.BackAppGradleResources.propertyBag.name }}_appVersion}
+            - add_run_variables runVarAppCommitSHA=${res_{{ .Values.BackAppGradleResources.propertyBag.name }}_appCommitSHA}
+
+      - name: {{ .Values.BackAppContainerSteps.dockerBuild.name }}
+        type: DockerBuild
+        configuration:
+          affinityGroup: together
+          dockerFileName: {{ .Values.BackAppContainerSteps.dockerBuild.dockerFileName }}
+          dockerFileLocation: {{ .Values.BackAppContainerSteps.dockerBuild.dockerFileLocation }}
+          dockerImageName: "{{ .Values.BackApp.container.registry }}/{{ .Values.BackApp.container.image }}"
+          dockerImageTag: ${runVarAppVersion}
+          inputSteps:
+            - name: setup_env
+          inputResources:
+            - name: {{ .Values.BackAppContainerResources.gitRepo.name }}
+            - name: {{ .Values.BackAppContainerResources.fileSpec.name }}
+          integrations:
+            - name: {{ .Values.BackApp.artifactoryIntegration }}
+        execution:
+          onStart:
+            - ls -la ${res_{{ .Values.BackAppContainerResources.fileSpec.name }}_resourcePath}
+            - cp ${res_{{ .Values.BackAppContainerResources.fileSpec.name }}_resourcePath}/*.jar ${res_{{ .Values.BackAppContainerResources.gitRepo.name }}_resourcePath}/back/CI/Docker/
+            - ls -la ${res_{{ .Values.BackAppContainerResources.gitRepo.name }}_resourcePath}/back/CI/Docker/
+            - cd ${res_{{ .Values.BackAppContainerResources.gitRepo.name }}_resourcePath}
+            # get last commit on the dockerfile
+            - add_run_variables runVarGitCommit=`git log -n 1 --pretty=format:%H -- back/CI/Docker/jfrog-Dockerfile`
+
+      - name: {{ .Values.BackAppContainerSteps.dockerPush.name }}
+        type: DockerPush
+        configuration:
+          affinityGroup: together
+          targetRepository: {{ .Values.BackAppContainerSteps.dockerPush.artifactoryTargetRepoName }}
+          autoPublishBuildInfo: {{ .Values.BackAppContainerSteps.dockerPush.autoPublishBuildInfo }}
+          inputSteps:
+            - name: {{ .Values.BackAppContainerSteps.dockerBuild.name }}
+          integrations:
+            - name: {{ .Values.BackApp.artifactoryIntegration }}
+          outputResources:
+            - name: {{ .Values.BackAppContainerResources.buildInfo.resourceName }}
+        execution:
+          onSuccess:
+            - echo "{{ .Values.BackAppContainerSteps.dockerPush.artifactoryTargetRepoName }}/{{ .Values.BackAppContainerSteps.dockerBuild.imageName }}/${runVarAppVersion}/manifest.json"
+            - jfrog rt sp --build=${res_{{ .Values.BackAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.BackAppContainerSteps.dockerPush.artifactoryTargetRepoName }}/{{ .Values.BackAppContainerSteps.dockerBuild.imageName }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
+
+      - name: {{ .Values.BackAppContainerSteps.xray.name }}
+        type: XrayScan
+        configuration:
+          failOnScan: false
+          inputResources:
+            - name: {{ .Values.BackAppContainerResources.buildInfo.resourceName }}
+              trigger: true
+
+      - name: {{ .Values.BackAppContainerSteps.promotion.name }}
+        type: PromoteBuild
+        configuration:
+          targetRepository: {{ .Values.BackApp.container.repoPromotion1 }}
+          includeDependencies: {{ .Values.BackAppContainerSteps.promotion.includeDependencies }}
+          status: {{ .Values.BackAppContainerSteps.promotion.status }}
+          comment: {{ .Values.BackAppContainerSteps.promotion.comment }}
+          copy: {{ .Values.BackAppContainerSteps.promotion.copy }}
+          integrations:
+            - name: {{ .Values.BackApp.artifactoryIntegration }}
+          inputResources:
+            - name: {{ .Values.BackAppContainerResources.buildInfo.resourceName }}
+              trigger: true
+          inputSteps:
+            - name: {{ .Values.BackAppContainerSteps.xray.name }}
+          outputResources:
+            - name: {{ .Values.BackAppContainerResources.promotion.resourceName }}
+            - name: {{ .Values.BackAppContainerResources.propertyBag.name }}
+        execution:
+          onSuccess:
+            - write_output {{ .Values.BackAppContainerResources.propertyBag.name }} newTag=${runVarAppVersion}
+            - write_output {{ .Values.BackAppContainerResources.propertyBag.name }} buildInfoName=${res_{{ .Values.BackAppContainerResources.buildInfo.resourceName }}_buildName}
+            - write_output {{ .Values.BackAppContainerResources.propertyBag.name }} buildInfoNumber=${run_number}
+
+  - name: {{ .Values.BackApp.pipelineDeployName }}
+    steps:
+      - name: setup_env
+        type: Bash
+        configuration:
+          affinityGroup: deploy
+          runtime:
+            type: host
+          inputResources:
+            - name: {{ .Values.BackAppContainerResources.propertyBag.name }}
+        execution:
+          onExecute:
+            - sudo mkdir -p /etc/docker 
+            - > 
+              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackApp.container.registry }}\"]}" > /etc/docker/daemon.json
+            - sudo systemctl restart docker
+            - sudo cat /etc/docker/daemon.json
+            - sudo systemctl status docker
+            - echo ${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_docker_newTag}
+            - add_run_variables runVarNewTag=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_docker_newTag}
+            - add_run_variables runVarBuildName=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_buildInfoName}
+            - add_run_variables runVarBuildNumber=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_buildInfoNumber}
+
+      - name: {{ .Values.BackAppContainerDeploySteps.helmDeploy.name }}
+        type: HelmDeploy
+        configuration:
+          environmentVariables:
+            JFROG_CLI_LOG_LEVEL: DEBUG
+          affinityGroup: deploy
+          helmVersion: 3
+          runtime:
+            type: image
+            image:
+              custom:
+                registry: {{ .Values.BackApp.artifactoryIntegration }}
+                name: "{{ .Values.BackApp.container.registry }}/{{ .Values.BackAppContainerDeploySteps.helmDeploy.container.image }}"
+                tag: {{ .Values.BackAppContainerDeploySteps.helmDeploy.container.tag }}
+                sourceRepository: {{ .Values.BackApp.container.registry }}
+          inputSteps:
+            - name: setup_env
+          integrations:
+            - name: {{ .Values.BackApp.k8sIntegration }}
+          inputResources:
+            - name: {{ .Values.BackAppContainerResources.helmChart.resourceName }}
+          releaseName: my-super-app
+          flags: "--debug --install --namespace {{ .Values.BackApp.k8sNamespace }} --cleanup-on-fail --set images.back.tag=${runVarNewTag} --set images.back.repository={{ .Values.BackApp.container.registry }}/{{ .Values.BackApp.container.image }}"
+          valueFilePaths:
+            - values.yaml
+        execution:
+          onStart:
+            - echo ${runVarNewTag}
+            - echo ${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_chart}
+            - echo ${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_version}
+            - add_run_variables runVarChartName=${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_chart}
+            - add_run_variables runVarChartVersion=${res_{{ .Values.BackAppContainerResources.helmChart.resourceName }}_version}
+
+      - name: {{ .Values.BackAppContainerDeploySteps.testing.name }}
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: {{ .Values.BackAppContainerDeploySteps.helmDeploy.name }}
+        execution:
+          onExecute:
+            - echo running tests !!!
+          onSuccess:
+            - echo tests OK !!!
+          onFailure:
+            - echo tests KO !!!
+          onComplete:
+            - echo stop deployment
+
+      - name: {{ .Values.BackAppContainerDeploySteps.promotion.name }}
+        type: Bash
+        configuration:
+          integrations:
+            - name: {{ .Values.BackApp.artifactoryIntegration }}
+          inputSteps:
+            - name: {{ .Values.BackAppContainerDeploySteps.testing.name }}
+        execution:
+          onExecute:
+            - echo ${runVarChartName}
+            - echo ${runVarChartVersion} 
+            - >
+              echo  "{\"targetRepo\" : \"{{ .Values.BackApp.container.repoPromotion2 }}\",\"dockerRepository\" : \"{{ .Values.BackApp.container.image }}\", \"tag\" : \"${runVarNewTag}\",\"targetTag\" : \"${runVarNewTag}\",\"copy\" : false}" > payload.json
+            - cat payload.json
+            # escape semi colon
+            - > 
+              jfrog rt curl -XPOST api/docker/{{ .Values.BackApp.container.soureRepo }}/v2/promote -H "Content-Type: application/json" -d @payload.json
+          onSuccess:
+            - echo  "jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.BackApp.container.repoPromotion2 }}/{{ .Values.BackApp.container.image }}/${runVarNewTag}/manifest.json \"validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}\""
+            - jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.BackApp.container.repoPromotion2 }}/{{ .Values.BackApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
