@@ -84,7 +84,7 @@ resources:
   - name:  {{ .Values.BackAppContainerDeployResources.helmChart.resourceName }}
     type: HelmChart
     configuration:
-      sourceArtifactory: {{ .Values.BackApp.ArtifactoryIntegration }}
+      sourceArtifactory: {{ .Values.BackApp.artifactoryIntegration }}
       repository: {{ .Values.BackAppContainerDeployResources.helmChart.repo }}
       chart: {{ .Values.BackAppContainerDeployResources.helmChart.name }}
       version: {{ .Values.BackAppContainerDeployResources.helmChart.version }}
@@ -124,8 +124,7 @@ pipelines:
             - echo $runVarGitCommit
             - jfrog rt sp --build=${res_{{ .Values.BackAppGradleResources.buildInfo.resourceName }}_buildName}/${run_number}  --exclusions="*.pom;*src*" {{ .Values.BackApp.gradle.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.BackApp.projectName }}"
 
-
-      - name: {{ .Values.BackAppGradleResources.xray.name }}
+      - name: {{ .Values.BackAppGradleSteps.xray.name }}
         type: XrayScan
         configuration:
           failOnScan: false
@@ -242,7 +241,7 @@ pipelines:
           inputSteps:
             - name: {{ .Values.BackAppContainerSteps.xray.name }}
           outputResources:
-            - name: {{ .Values.BackAppContainerResources.promotion.resourceName }}
+            - name: {{ .Values.BackAppContainerResources.buildInfoPromotion.resourceName }}
             - name: {{ .Values.BackAppContainerResources.propertyBag.name }}
         execution:
           onSuccess:
