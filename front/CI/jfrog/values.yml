@@ -1,5 +1,5 @@
 FrontApp:
-  pipelineName: k8s_frontapp_npm
+  pipelineName: k8s_frontapp_js
   pipelineContainerName: k8s_frontapp_js_docker
   pipelineDeployName: k8s_frontapp_js_deployment
   projectName: avengers
@@ -46,11 +46,11 @@ FrontAppJSSteps:
     args: "--no-progress --no-audit"
     sourceLocation: front/
   packageAndPublish:
-    name: package_and_publish_k8s_frontapp_npm
+    name: package_and_publish_k8s_frontapp_js
   xray:
-    name: scan_bi_k8s_frontapp_npm
+    name: scan_bi_k8s_frontapp_js
   promotion:
-    name: promote_bi_k8s_frontapp_npm
+    name: promote_bi_k8s_frontapp_js
     includeDependencies: false
     status: SANDBOX_OK
     comment: Unit testing and Xray scan passed succesfully
