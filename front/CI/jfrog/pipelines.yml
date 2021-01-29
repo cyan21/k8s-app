@@ -145,9 +145,9 @@ pipelines:
             - if [ $OFFLINE_MODE == "true" ]; then echo "Offline mode turned on";fi
           onSuccess:
             - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
-            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
+            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
             - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
-            - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number} {{ .Values.FrontApp.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+            - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
 
       - name: {{ .Values.FrontAppJSSteps.xray.name }}
         type: XrayScan

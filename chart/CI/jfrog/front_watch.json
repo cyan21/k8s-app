@@ -77,7 +77,7 @@
             {
                 "type": "build",
                 "bin_mgr_id": "unused",
-                "name": "k8s_frontapp_npm"
+                "name": "k8s_frontapp_js"
             },
             {
                 "type": "build",
