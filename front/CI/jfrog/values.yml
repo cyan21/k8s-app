@@ -1,0 +1,128 @@
+FrontApp:
+  pipelineName: k8s_frontapp_npm
+  pipelineContainerName: k8s_frontapp_js_docker
+  pipelineDeployName: k8s_frontapp_js_deployment
+  projectName: avengers
+  appName: frontapp
+  artifactoryIntegration: artifactory_eu
+  k8sIntegration: yann_k8s
+  k8sNamespace: kaivengers
+  js:
+    repoNpmSource: avengers-npm
+    repoSource: avengers-generic
+    repoPromotion1: avengers-generic-rc-local
+  container:
+    registry: avengers-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    image: frontapp-js
+    repoSource: avengers-docker
+    repoPromotion1: avengers-docker-rc-local
+    repoPromotion2: avengers-docker-release-local
+
+##########################################
+## NPM Pipeline
+##########################################
+
+FrontAppNpmResources:
+  gitRepo:
+    name: src_code_k8s_frontapp_js
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: jfrog-ode
+    files:
+      exclude: '^front\/CI\/.+'
+      include: '^front\/.+'
+  buildInfo:
+    resourceName: bi_k8s_frontapp_js
+    name: k8s_frontapp_js
+  buildInfoPromotion:
+    resourceName: bi_k8s_frontapp_js_promoted_staging
+  propertyBag: 
+    name: pb_k8s_frontapp_js
+
+FrontAppJSSteps:
+  npmBuild:
+    name: build_k8s_frontapp_js
+    args: "--no-progress --no-audit"
+    sourceLocation: front/
+  packageAndPublish:
+    name: package_and_publish_k8s_frontapp_npm
+  xray:
+    name: scan_bi_k8s_frontapp_npm
+  promotion:
+    name: promote_bi_k8s_frontapp_npm
+    includeDependencies: false
+    status: SANDBOX_OK
+    comment: Unit testing and Xray scan passed succesfully
+    copy: false
+
+##########################################
+## CONTAINER PIPELINE
+##########################################
+
+FrontAppContainerResources:
+  gitRepo:
+    name: src_dockerfile_k8s_frontapp_js
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: jfrog-ode
+    files:
+      include: '^front\/CI\/Docker\/.+'
+  fileSpec:
+    name: fs_frontapp_js
+    flat: true
+  buildInfo:
+    resourceName: bi_k8s_frontapp_js_docker
+    name: k8s_frontapp_js_docker
+  buildInfoPromotion:
+    resourceName: bi_k8s_frontapp_js_docker_promoted_staging
+  propertyBag: 
+    name: pb_k8s_frontapp_js_docker
+
+FrontAppContainerSteps:
+  dockerBuild:
+    name: build_k8s_frontapp_js_docker
+    dockerFileName: Dockerfile
+    dockerFileLocation: front/CI/Docker/
+  dockerPush:
+    name: publish_k8s_frontapp_js_docker
+    autoPublishBuildInfo: true
+  xray:
+    name: scan_k8s_frontapp_js_docker
+  promotion:
+    name: promote_bi_k8s_frontapp_js_docker
+    includeDependencies: false
+    status: SCAN_OK
+    comment: Xray scan OK 
+    copy: false
+
+##########################################
+## K8S PIPELINE
+##########################################
+
+FrontAppContainerDeployResources:
+  gitRepo:
+    name: src_code_k8s_frontapp_chart
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: 'jfrog-ode'
+    files:
+      include: '^chart\/.+'
+  helmChart:
+    resourceName: hc_my_app_frontapp_js
+    repo: kaivengers-helm
+    name: myapp
+    version: 1.0.0
+    
+FrontAppContainerDeploySteps:
+  helmDeploy:
+    name: deploy_helm_chart
+    container: # workaround to make Helm V3 to work
+      image: jfrog/pipelines-u18node
+      tag: 10.21.0-jfrog
+  testing:
+    name: run_app_test
+  promotion:
+    name: promote_b8s_frontapp_js_docker_image

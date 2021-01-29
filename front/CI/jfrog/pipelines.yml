@@ -1,0 +1,376 @@
+resources:
+# NPM PIPELINE
+  - name: {{ .Values.FrontAppNpmResources.gitRepo.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.FrontAppNpmResources.gitRepo.gitProvider }}
+      path: {{ .Values.FrontAppNpmResources.gitRepo.path }}
+      branches:
+        include: {{ .Values.FrontAppNpmResources.gitRepo.branches.include }}
+      files:
+        include: {{ .Values.FrontAppNpmResources.gitRepo.files.include }}
+        exclude: {{ .Values.FrontAppNpmResources.gitRepo.files.exclude }}
+
+  # Build info for the published Npm App
+  - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.FrontApp.artifactoryIntegration }}
+      buildName:  {{ .Values.FrontAppNpmResources.buildInfo.name }}
+      buildNumber: ${run_number}
+  
+  - name: {{ .Values.FrontAppNpmResources.buildInfoPromotion.resourceName }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.FrontApp.artifactoryIntegration }}
+      buildName: {{ .Values.FrontAppNpmResources.buildInfo.name }}
+      buildNumber: ${run_number}
+
+  - name: {{ .Values.FrontAppNpmResources.propertyBag.name }}
+    type: PropertyBag
+    configuration:
+      biNumber: XXX
+
+# DOCKER PIPELINE
+  - name: {{ .Values.FrontAppContainerResources.gitRepo.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.FrontAppContainerResources.gitRepo.gitProvier }}
+      path: {{ .Values.FrontAppContainerResources.gitRepo.path }}
+      branches:
+        include: {{ .Values.FrontAppContainerResources.gitRepo.branches.include }}
+      files:
+        include: {{ .Values.FrontAppContainerResources.gitRepo.files.include }}
+
+  - name: {{ .Values.FrontAppContainerResources.fileSpec.name }}
+    type: FileSpec
+    configuration:
+      sourceArtifactory: {{ .Values.FrontApp.artifactoryIntegration }}
+      pattern: "{{ .Values.FrontApp.js.repoSource }}/{{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz"
+      flat: true
+
+  - name: {{ .Values.FrontAppContainerResources.buildInfo.resourceName }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.FrontApp.artifactoryIntegration }}
+      buildName: {{ .Values.FrontAppContainerResources.buildInfo.name }}
+      buildNumber: ${run_number}
+
+  - name: {{ .Values.FrontAppContainerResources.buildInfoPromotion.resourceName }}
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: {{ .Values.FrontApp.artifactoryIntegration }}
+      buildName: {{ .Values.FrontAppContainerResources.buildInfo.name }}
+      buildNumber: ${run_number}
+
+  - name: {{ .Values.FrontAppContainerResources.propertyBag.name }}
+    type: PropertyBag
+    configuration:
+      newTag: XXX
+
+# HELM PIPELINE
+  - name: {{ .Values.FrontAppContainerDeployResources.gitRepo.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.FrontAppContainerDeployResources.gitRepo.gitProvider }}
+      path: {{ .Values.FrontAppContainerDeployResources.gitRepo.path }}
+      branches:
+        include: {{ .Values.FrontAppContainerDeployResources.gitRepo.branches.include }}
+      files:
+        include: {{ .Values.FrontAppContainerDeployResources.gitRepo.files.include }}
+
+  - name: {{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}
+    type: HelmChart
+    configuration:
+      sourceArtifactory: {{ .Values.FrontApp.artifactoryIntegration }}
+      repository: {{ .Values.FrontAppContainerDeployResources.helmChart.repo }}
+      chart: {{ .Values.FrontAppContainerDeployResources.helmChart.name }}
+      version: {{ .Values.FrontAppContainerDeployResources.helmChart.version }}
+
+pipelines:
+  - name: {{ .Values.FrontApp.pipelineName }}
+    steps:
+      - name: {{ .Values.FrontAppJSSteps.npmBuild.name }}
+        type: NpmBuild
+        configuration:
+          npmArgs: {{ .Values.FrontAppJSSteps.npmBuild.args }}
+          affinityGroup: together
+          repositoryName: {{ .Values.FrontApp.js.repoNpmSource }}
+          sourceLocation: {{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}
+          integrations:
+            - name: {{ .Values.FrontApp.artifactoryIntegration }}
+          inputResources:
+            - name: {{ .Values.FrontAppNpmResources.gitRepo.name }}
+        execution:
+          onStart:
+            # to inject CI URL into the build info
+            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
+            # retrieved cached dependencies (stored onSucess execution)            
+            - restore_cache_files npm_cache ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/node_modules
+          onSuccess:
+            - add_run_variables runVarAppVersion=`jq -r ".version" ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/package.json`
+            - echo $runVarAppVersion
+            - add_run_variables runVarGitCommit=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_commitSha}
+            # cache node_modules folder for future runs
+            - add_cache_files ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/node_modules npm_cache
+            # pass front folder to next step
+            - add_run_files  ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }} mySources            
+            # pass JFrog CLI tmp folder to next step
+            - add_run_files  /tmp/jfrog  jfrogCLI_tmp
+
+      - name: {{ .Values.FrontAppJSSteps.packageAndPublish.name }}
+        type: Bash
+        configuration:
+          affinityGroup: together
+          environmentVariables:
+            OFFLINE_MODE: "true"
+          inputSteps:
+            - name: {{ .Values.FrontAppJSSteps.npmBuild.name }}
+          integrations:
+            - name: {{ .Values.FrontApp.artifactoryIntegration }}
+          outputResources:
+            - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
+        execution:
+          onStart:
+            - restore_run_files mySources .
+            - mkdir /tmp/jfrog 
+            - restore_run_files jfrogCLI_tmp /tmp/jfrog/
+            - ls -l /tmp/jfrog/
+            - npm run build
+          onExecute:
+            - echo "Run Unit Testing ..." 
+            - if [ $OFFLINE_MODE == "true" ]; then echo "Offline mode turned on";fi
+          onSuccess:
+            - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
+            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
+            - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
+            - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number} {{ .Values.FrontApp.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+
+      - name: {{ .Values.FrontAppJSSteps.xray.name }}
+        type: XrayScan
+        configuration:
+          failOnScan: false
+          inputResources:
+            - name: {{ .Values.FrontAppNpmResources.buildInfo.name }}
+              trigger: true
+
+      - name: {{ .Values.FrontAppJSSteps.promotion.name }}
+        type: PromoteBuild
+        configuration:
+          targetRepository: {{ .Values.FrontApp.repoPromotion1 }}
+          includeDependencies: {{ .Values.FrontAppJSSteps.promotion.includeDependencies }}
+          status: {{ .Values.FrontAppJSSteps.promotion.status }}
+          comment: {{ .Values.FrontAppJSSteps.promotion.comment }}
+          copy: {{ .Values.FrontAppJSSteps.promotion.copy }}
+          inputSteps:
+            - name: {{ .Values.FrontAppJSSteps.xray.name }}
+          inputResources:
+            - name: {{ .Values.FrontAppNpmResources.buildInfo.name }}
+              trigger: true
+          outputResources:
+            - name: {{ .Values.FrontAppNpmResources.buildInfoPromotion.name }}
+            - name: {{ .Values.FrontAppNpmResources.propertyBag.name }}            
+        execution:  
+          onStart:
+            - echo ${res_{{ .Values.FrontAppNpmResources.buildInfo.name }}_buildName} 
+            - echo ${res_{{ .Values.FrontAppNpmResources.buildInfo.name }}_buildNumber} 
+            - echo ${runVarAppVersion}
+          onSuccess:            
+            - write_output {{ .Values.FrontAppNpmResources.propertyBag.name }} appVersion=${runVarAppVersion}
+            - write_output {{ .Values.FrontAppNpmResources.propertyBag.name }} appCommitSHA=${runVarGitCommit}
+
+  - name: {{ .Values.FrontApp.pipelineContainerName }}
+    steps:
+      - name: setup_env
+        type: Bash
+        configuration:
+          affinityGroup: together
+          runtime:
+            type: host
+          inputResources:
+            - name: {{ .Values.FrontAppNpmResources.propertyBag.name }}
+        execution:
+          onExecute:
+            - sudo mkdir -p /etc/docker 
+            - > 
+              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.FrontApp.container.registy }}\"]}" > /etc/docker/daemon.json
+            - sudo systemctl restart docker
+            - sudo cat /etc/docker/daemon.json
+            - add_run_variables runVarAppVersion=${res_{{ .Values.FrontAppNpmResources.propertyBag.name }}_appVersion}
+            - add_run_variables runVarAppCommitSHA=${res_{{ .Values.FrontAppNpmResources.propertyBag.name }}_appCommitSHA}
+
+      - name: {{ .Values.FrontAppContainerSteps.dockerBuild.name }}
+        type: DockerBuild
+        configuration:
+          affinityGroup: together
+          dockerFileName: {{ .Values.FrontAppContainerSteps.dockerBuild.dockerFileName }}
+          dockerFileLocation: {{ .Values.FrontAppContainerSteps.dockerBuild.dockerFileLocation }}
+          dockerImageName: "{{ .Values.FrontApp.container.registy }}/{{ .Values.FrontApp.container.image }}"
+          dockerImageTag: ${runVarAppVersion}
+          inputSteps:
+            - name: setup_env
+          inputResources:
+            - name: {{ .Values.FrontAppContainerResources.gitRepo.name }}
+            - name: {{ .Values.FrontAppContainerResources.fileSpec.name }}
+          integrations:
+            - name: {{ .Values.FrontApp.artifactoryIntegration }}
+        execution:
+          onStart:
+            - ls -la ${res_{{ .Values.FrontAppContainerResources.fileSpec.name }}_resourcePath}
+            - cp ${res_{{ .Values.FrontAppContainerResources.fileSpec.name }}_resourcePath}/{{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz ${res_{{ .Values.FrontAppContainerResources.gitRepo.name }}_resourcePath}/front/CI/Docker/app.tar.gz
+            - ls -la ${res_{{ .Values.FrontAppContainerResources.gitRepo.name }}_resourcePath}/front/CI/Docker/
+            - cd ${res_{{ .Values.FrontAppContainerResources.gitRepo.name }}_resourcePath}
+            # get last commit on the dockerfile
+            - add_run_variables runVarGitCommit=`git log -n 1 --pretty=format:%H -- front/CI/Docker/Dockerfile`
+      - name: {{ .Values.FrontAppContainerSteps.dockerPush.name }}
+        type: DockerPush
+        configuration:
+          affinityGroup: together
+          targetRepository: {{ .Values.FrontApp.container.repoSource }}
+          autoPublishBuildInfo: {{ .Values.FrontAppContainerSteps.dockerPush.autoPublishBuildInfo }}
+          inputSteps:
+            - name: {{ .Values.FrontAppContainerSteps.dockerBuild.name }}
+          integrations:
+            - name: {{ .Values.FrontApp.artifactoryIntegration }}
+          outputResources:
+            - name: {{ .Values.FrontAppContainerResources.buildInfo.resourceName }}
+        execution:
+          onSuccess:
+            - echo "{{ .Values.FrontApp.container.repoSource }}/${envVarAppName}/${runVarAppVersion}/manifest.json"
+            - jfrog rt sp --build=${res_{{ .Values.FrontAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.FrontApp.container.repoSource }}/{{ .Values.FrontApp.container.image }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
+
+      - name: {{ .Values.FrontAppContainerSteps.xray.name }}
+        type: XrayScan
+        configuration:
+          failOnScan: false
+          inputResources:
+            - name: {{ .Values.FrontAppContainerResources.buildInfo.resourceName }}
+              trigger: true
+
+      - name: {{ .Values.FrontAppContainerSteps.promotion.name }}
+        type: PromoteBuild
+        configuration:
+          targetRepository: {{ .Values.FrontApp.container.repoPromotion1 }}
+          includeDependencies: false
+          status: {{ .Values.FrontAppContainerSteps.promotion.status }}
+          comment: {{ .Values.FrontAppContainerSteps.promotion.comment }}
+          copy: {{ .Values.FrontAppContainerSteps.promotion.copy }}
+          integrations:
+            - name: {{ .Values.FrontApp.artifactoryIntegration }}
+          inputResources:
+            - name: {{ .Values.FrontAppContainerResources.buildInfo.resourceName }}
+              trigger: true
+          inputSteps:
+            - name: {{ .Values.FrontAppContainerSteps.xray.name }}
+          outputResources:
+            - name: {{ .Values.FrontAppContainerResources.buildInfoPromotion.resourceName }}
+            - name: {{ .Values.FrontAppContainerResources.propertyBag.name }}
+        execution:
+          onSuccess:
+            - write_output {{ .Values.FrontAppContainerResources.propertyBag.name }} newTag=${runVarAppVersion}
+            - write_output {{ .Values.FrontAppContainerResources.propertyBag.name }} buildInfoName=${res_{{ .Values.FrontAppContainerResources.buildInfo.resourceName }}_buildName}
+            - write_output {{ .Values.FrontAppContainerResources.propertyBag.name }} buildInfoNumber=${run_number}
+
+  - name: {{ .Values.FrontApp.pipelineDeployName }}
+    # configuration:
+    #   environmentVariables:
+    #     readOnly:
+    #       envVarAppName: frontapp-js
+    #       envVarDockerRepo: avengers-docker
+    #       envVarDockerRegistry: ${envVarDockerRepo}.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80
+    #       envVarDockerSourceRepo: avengers-rc-docker-local
+    #       envVarDockerPromoteRepo: avengers-release-docker-local
+    #       envVarK8SNameSpace: kaivengers
+    #       envVarRuntimeImgName: jfrog/pipelines-u18node
+    #       envVarRuntimeImgVers: 10.21.0-jfrog
+    #       envVarHelmRepo: kaivengers-helm
+    #       envVarHelmName: myapp
+    #       envVarHelmVers: 1.0.0
+    steps:
+      - name: setup_env
+        type: Bash
+        configuration:
+          affinityGroup: deploy
+          runtime:
+            type: host
+          inputResources:
+            - name: {{ .Values.FrontAppContainerResources.propertyBag.name }}
+        execution:
+          onExecute:
+            - sudo mkdir -p /etc/docker 
+            - > 
+              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.FrontApp.container.registy }}\"]}" > /etc/docker/daemon.json
+            - sudo systemctl restart docker
+            - sudo cat /etc/docker/daemon.json
+            - sudo systemctl status docker
+            - echo ${res_{{ .Values.FrontAppContainerResources.propertyBag.name }}_newTag}
+            - add_run_variables runVarNewTag=${res_{{ .Values.FrontAppContainerResources.propertyBag.name }}_newTag}
+            - add_run_variables runVarBuildName=${res_{{ .Values.FrontAppContainerResources.propertyBag.name }}_buildInfoName}
+            - add_run_variables runVarBuildNumber=${res_{{ .Values.FrontAppContainerResources.propertyBag.name }}_buildInfoNumber}
+      
+      - name: {{ .Values.FrontAppContainerDeploySteps.helmDeploy.name }}
+        type: HelmDeploy
+        configuration:
+          affinityGroup: deploy
+          helmVersion: 3
+          runtime:
+            type: image
+            image:
+              custom:
+                registry: {{ .Values.FrontApp.artifactoryIntegration }}
+                name: "{{ .Values.FrontApp.container.registry }}/{{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.image }}"
+                tag: {{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.tag }}
+                sourceRepository: {{ .Values.FrontApp.container.repoSource }}
+          inputSteps:
+            - name: setup_env
+          integrations:
+            - name: {{ .Values.FrontApp.container.k8sIntegration }}
+          inputResources:
+            - name: {{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}
+          releaseName: my-super-app
+          flags: "--debug --install --namespace {{ .Values.FrontApp.container.k8sNamespace }} --cleanup-on-fail --set images.front.tag=${runVarNewTag} --set images.front.repository={{ .Values.FrontApp.container.registry }}/{{ .Values.FrontApp.container.image }}"
+          valueFilePaths:
+            - values.yaml
+        execution:
+          onStart:
+            - echo ${runVarNewTag}
+            - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_chart}
+            - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_version}
+            - add_run_variables runVarChartName=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_chart}
+            - add_run_variables runVarChartVersion=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_version}
+     
+      - name: {{ .Values.FrontAppContainerDeploySteps.testing.name }}
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: {{ .Values.FrontAppContainerDeploySteps.helmDeploy.name }}
+        execution:
+          onExecute:
+            - echo running tests !!!
+          onSuccess:
+            - echo tests OK !!!
+          onFailure:
+            - echo tests KO !!!
+          onComplete:
+            - echo stop deployment
+     
+      - name: {{ .Values.FrontAppContainerDeploySteps.promotion.name }}
+        type: Bash
+        configuration:
+          integrations:
+            - name: {{ .Values.FrontApp.artifactoryIntegration }}
+          inputSteps:
+            - name: {{ .Values.FrontAppContainerDeploySteps.testing.name }}
+        execution:
+          onExecute:
+            - echo ${runVarChartName}
+            - echo ${runVarChartVersion} 
+            - >
+              echo  "{\"targetRepo\" : \"{{ .Values.FrontApp.container.repoPromotion2 }}\",\"dockerRepository\" : \"{{ .Values.FrontApp.container.image }}\", \"tag\" : \"${runVarNewTag}\",\"targetTag\" : \"${runVarNewTag}\",\"copy\" : false}" > payload.json
+            - cat payload.json
+            # escape semi colon
+            - > 
+              jfrog rt curl -XPOST api/docker/{{ .Values.FrontApp.container.repoPromotion1 }}/v2/promote -H "Content-Type: application/json" -d @payload.json
+          onSuccess:
+            - echo  "jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json \"validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}\""
+            - jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
