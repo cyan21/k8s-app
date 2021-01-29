@@ -154,13 +154,13 @@ pipelines:
         configuration:
           failOnScan: false
           inputResources:
-            - name: {{ .Values.FrontAppNpmResources.buildInfo.name }}
+            - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
               trigger: true
 
       - name: {{ .Values.FrontAppJSSteps.promotion.name }}
         type: PromoteBuild
         configuration:
-          targetRepository: {{ .Values.FrontApp.repoPromotion1 }}
+          targetRepository: {{ .Values.FrontApp.js.repoPromotion1 }}
           includeDependencies: {{ .Values.FrontAppJSSteps.promotion.includeDependencies }}
           status: {{ .Values.FrontAppJSSteps.promotion.status }}
           comment: {{ .Values.FrontAppJSSteps.promotion.comment }}
@@ -168,10 +168,10 @@ pipelines:
           inputSteps:
             - name: {{ .Values.FrontAppJSSteps.xray.name }}
           inputResources:
-            - name: {{ .Values.FrontAppNpmResources.buildInfo.name }}
+            - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
               trigger: true
           outputResources:
-            - name: {{ .Values.FrontAppNpmResources.buildInfoPromotion.name }}
+            - name: {{ .Values.FrontAppNpmResources.buildInfoPromotion.resourceName }}
             - name: {{ .Values.FrontAppNpmResources.propertyBag.name }}            
         execution:  
           onStart:
