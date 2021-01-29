@@ -336,7 +336,7 @@ pipelines:
             - cat payload.json
             # escape semi colon
             - > 
-              jfrog rt curl -XPOST api/docker/{{ .Values.BackApp.container.soureRepo }}/v2/promote -H "Content-Type: application/json" -d @payload.json
+              jfrog rt curl -XPOST api/docker/{{ .Values.BackApp.container.repoPromotion1 }}/v2/promote -H "Content-Type: application/json" -d @payload.json
           onSuccess:
             - echo  "jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.BackApp.container.repoPromotion2 }}/{{ .Values.BackApp.container.image }}/${runVarNewTag}/manifest.json \"validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}\""
             - jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.BackApp.container.repoPromotion2 }}/{{ .Values.BackApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
