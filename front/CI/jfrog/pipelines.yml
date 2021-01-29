@@ -38,7 +38,7 @@ resources:
   - name: {{ .Values.FrontAppContainerResources.gitRepo.name }}
     type: GitRepo
     configuration:
-      gitProvider: {{ .Values.FrontAppContainerResources.gitRepo.gitProvier }}
+      gitProvider: {{ .Values.FrontAppContainerResources.gitRepo.gitProvider }}
       path: {{ .Values.FrontAppContainerResources.gitRepo.path }}
       branches:
         include: {{ .Values.FrontAppContainerResources.gitRepo.branches.include }}
@@ -225,6 +225,7 @@ pipelines:
             - cd ${res_{{ .Values.FrontAppContainerResources.gitRepo.name }}_resourcePath}
             # get last commit on the dockerfile
             - add_run_variables runVarGitCommit=`git log -n 1 --pretty=format:%H -- front/CI/Docker/Dockerfile`
+      
       - name: {{ .Values.FrontAppContainerSteps.dockerPush.name }}
         type: DockerPush
         configuration:
@@ -275,20 +276,6 @@ pipelines:
             - write_output {{ .Values.FrontAppContainerResources.propertyBag.name }} buildInfoNumber=${run_number}
 
   - name: {{ .Values.FrontApp.pipelineDeployName }}
-    # configuration:
-    #   environmentVariables:
-    #     readOnly:
-    #       envVarAppName: frontapp-js
-    #       envVarDockerRepo: avengers-docker
-    #       envVarDockerRegistry: ${envVarDockerRepo}.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80
-    #       envVarDockerSourceRepo: avengers-rc-docker-local
-    #       envVarDockerPromoteRepo: avengers-release-docker-local
-    #       envVarK8SNameSpace: kaivengers
-    #       envVarRuntimeImgName: jfrog/pipelines-u18node
-    #       envVarRuntimeImgVers: 10.21.0-jfrog
-    #       envVarHelmRepo: kaivengers-helm
-    #       envVarHelmName: myapp
-    #       envVarHelmVers: 1.0.0
     steps:
       - name: setup_env
         type: Bash
@@ -327,7 +314,7 @@ pipelines:
           inputSteps:
             - name: setup_env
           integrations:
-            - name: {{ .Values.FrontApp.container.k8sIntegration }}
+            - name: {{ .Values.FrontApp.k8sIntegration }}
           inputResources:
             - name: {{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}
           releaseName: my-super-app
