@@ -102,6 +102,12 @@ resources:
       buildName: {{ .Values.ChartResources.buildInfo.name }}
       buildNumber: ${run_number} 
 
+  - name: {{ .Values.ChartResources.buildInfoPromoted.resourceName }}
+    type: BuildInfo 
+    configuration:
+      sourceArtifactory: {{ .Values.Chart.artifactoryIntegration }}
+      buildName: {{ .Values.ChartResources.buildInfo.name }}
+      buildNumber: ${run_number} 
 
 pipelines:
 ## INIT PIPELINE
