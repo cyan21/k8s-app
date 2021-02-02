@@ -79,7 +79,7 @@ resources:
       chart: {{ .Values.Chart.name }}
       version: {{ .Values.Chart.version }}
 
-  - name: {{ .Values.ChartResources.filespec.front.name }}
+  - name: {{ .Values.ChartResources.fileSpec.front.name }}
     type: FileSpec
     configuration:
       sourceArtifactory: artifactory_eu
@@ -87,7 +87,7 @@ resources:
       target: front/manifest.json
       flat: true
 
-  - name: {{ .Values.ChartResources.filespec.back.name }}
+  - name: {{ .Values.ChartResources.fileSpec.back.name }}
     type: FileSpec
     configuration:
       sourceArtifactory: artifactory_eu
