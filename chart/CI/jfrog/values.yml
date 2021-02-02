@@ -84,7 +84,8 @@ ChartResources:
   chart:
     name: hc_new_myapp
   buildInfo:
-    name: bi_hc_new_myapp
+    resourceName: bi_hc_new_myapp
+    name: k8s_helm_chart
   fileSpec:
     front:
       name: fs_front_docker_manifest

@@ -224,16 +224,16 @@ pipelines:
           lint: {{ .Values.InitSteps.publishHelm.lint }}
           autoPublishBuildInfo: {{ .Values.InitSteps.publishHelm.autoPublishBuildInfo }}
           inputResources:
-            - name: {{ .Values.ChartResources.gitRepoHelm.name }}            
+            - name: {{ .Values.ChartResources.gitRepo.name }}            
             - name: {{ .Values.ChartResources.fileSpec.front.name }}
             - name: {{ .Values.ChartResources.fileSpec.back.name }}
           inputSteps:
-            - name: create_resources
+            - name: setup_variables
           integrations:
             - name: {{ .Values.Chart.artifactoryIntegration }}
           outputResources:
-            - name: {{ .Values.ChartResources.chart.resourceName }}
-            - name: {{ .Values.ChartResources.buildInfoContainer.resourceName }}
+            - name: {{ .Values.ChartResources.chart.name }}
+            - name: {{ .Values.ChartResources.buildInfo.resourceName }}
         execution:
           onStart:
             - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
