@@ -95,7 +95,7 @@ ChartResources:
   buildInfo:
     resourceName: bi_hc_new_myapp
     name: k8s_helm_chart
-  buildInfoPromotion:
+  buildInfoPromoted:
     resourceName: bi_hc_new_myapp_promoted
   fileSpec:
     front:
