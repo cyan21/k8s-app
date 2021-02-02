@@ -87,7 +87,7 @@ resources:
       target: front/manifest.json
       flat: true
 
-  - name: {{ .Values.ChartResources.filespec.front.name }}
+  - name: {{ .Values.ChartResources.filespec.back.name }}
     type: FileSpec
     configuration:
       sourceArtifactory: artifactory_eu
@@ -225,15 +225,15 @@ pipelines:
           autoPublishBuildInfo: {{ .Values.InitSteps.publishHelm.autoPublishBuildInfo }}
           inputResources:
             - name: {{ .Values.ChartResources.gitRepoHelm.name }}            
-            - name: {{ .Values.ChartResources.filespec.front.name }}
-            - name: {{ .Values.ChartResources.filespec.back.name }}
+            - name: {{ .Values.ChartResources.fileSpec.front.name }}
+            - name: {{ .Values.ChartResources.fileSpec.back.name }}
           inputSteps:
             - name: create_resources
           integrations:
-            - name: {{ .Values.Init.artifactoryIntegration }}
+            - name: {{ .Values.Chart.artifactoryIntegration }}
           outputResources:
-            - name: {{ .Values.InitResources.chart.resourceName }}
-            - name: {{ .Values.InitResources.buildInfoContainer.resourceName }}
+            - name: {{ .Values.ChartResources.chart.resourceName }}
+            - name: {{ .Values.ChartResources.buildInfoContainer.resourceName }}
         execution:
           onStart:
             - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp

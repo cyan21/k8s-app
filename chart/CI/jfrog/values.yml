@@ -82,8 +82,10 @@ ChartResources:
     files:
       include: ^chart\/content\/.+
   chart:
-    name:
-  filespec:
+    name: hc_new_myapp
+  buildInfo:
+    name: bi_hc_new_myapp
+  fileSpec:
     front:
       name: fs_front_docker_manifest
     back:
