@@ -313,5 +313,5 @@ pipelines:
           inputSteps:
             - name: {{ .Values.ChartSteps.testing.name }}
           outputResources:
-            - name: {{ .Values.ChartResources.buildInfoPromotion.resourceName }}
+            - name: {{ .Values.ChartResources.buildInfoPromoted.resourceName }}
 
