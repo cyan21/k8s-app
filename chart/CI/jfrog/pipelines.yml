@@ -71,7 +71,7 @@ resources:
       buildOn:
          commit: false
 
-  - name: {{ .Values.ChartResources.chart.resourceName }}
+  - name: {{ .Values.ChartResources.chart.name }}
     type: HelmChart
     configuration:
       sourceArtifactory: {{ .Values.Chart.artifactoryIntegration }}
@@ -94,6 +94,14 @@ resources:
       pattern:  ${runVarBackManifest}
       target: back/manifest.json
       flat: true
+
+  - name: {{ .Values.ChartResources.buildInfo.resourceName }}
+    type: BuildInfo 
+    configuration:
+      sourceArtifactory: {{ .Values.Chart.artifactoryIntegration }}
+      buildName: {{ .Values.ChartResources.buildInfo.name }}
+      buildNumber: ${run_number} 
+
 
 pipelines:
 ## INIT PIPELINE
