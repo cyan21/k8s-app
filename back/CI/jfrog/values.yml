@@ -12,7 +12,7 @@ BackApp:
   container:
     registry: kaizoku-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
     image: backapp-gradle-docker
-    repoSource: kaizoku-docker
+    repoSource: kaizoku-docker-dev-local
     repoPromotion1: kaizoku-docker-rc-local
     repoPromotion2: kaizoku-docker-release-local
 
