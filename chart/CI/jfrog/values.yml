@@ -10,6 +10,7 @@ Init:
     repo: kaivengers-helm
     name: myapp
     version: 1.0.0
+
   artifactoryIntegration: artifactory_eu
 
 InitResources:
@@ -67,10 +68,18 @@ InitSteps:
 
 Chart:
   pipelineName: k8s_bump_helm_chart
+  container:
+    registry: kaivengers-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    image: jfrog/pipelines-u18node
+    tag: 10.21.0-jfrog
+    repoSource: kaivengers-docker
   repo: kaivengers-helm
+  repoPromotion1: kaivengers-helm-release-local
   name: myapp
   version: 2.0.0
   artifactoryIntegration: artifactory_eu
+  k8sIntegration: yann_k8s
+  k8sNamespace: kaivengers
 
 ChartResources:
   gitRepo:
@@ -86,8 +95,27 @@ ChartResources:
   buildInfo:
     resourceName: bi_hc_new_myapp
     name: k8s_helm_chart
+  buildInfoPromotion:
+    resourceName: bi_hc_new_myapp_promoted
   fileSpec:
     front:
       name: fs_front_docker_manifest
     back:
       name: fs_back_docker_manifest
+
+ChartSteps:
+  publishHelm:
+    name: publish_helm_chart
+    path: chart/content/
+    lint: true
+    autoPublishBuildInfo: true
+  helmDeploy:
+    name: deploy_new_chart
+  testing:
+    name: test_app
+  promotion:
+    name: promote_helm_chart
+    includeDependencies: false
+    status: TEST_OK
+    comment: passed non regression test
+    copy: false
