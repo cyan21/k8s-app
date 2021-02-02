@@ -10,6 +10,11 @@ localRepositories:
     repoLayout: simple-default 
     xray:   
       enabled: false
+  kaivengers-helm-release-local:
+    type: helm
+    repoLayout: simple-default 
+    xray:   
+      enabled: false
 remoteRepositories: 
   kaivengers-dockerhub-remote:
     type: docker 
@@ -48,5 +53,6 @@ virtualRepositories:
     repoLayout: simple-default 
     repositories:   
       - kaivengers-helm-dev-local
+      - kaivengers-helm-release-local
       - kaivengers-chartcenter-remote
     defaultDeploymentRepo: kaivengers-helm-dev-local
