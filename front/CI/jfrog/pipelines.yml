@@ -208,7 +208,7 @@ pipelines:
           affinityGroup: together
           dockerFileName: {{ .Values.FrontAppContainerSteps.dockerBuild.dockerFileName }}
           dockerFileLocation: {{ .Values.FrontAppContainerSteps.dockerBuild.dockerFileLocation }}
-          dockerImageName: "{{ .Values.FrontApp.container.registy }}/{{ .Values.FrontApp.container.image }}"
+          dockerImageName: "{{ .Values.FrontApp.container.registry }}/{{ .Values.FrontApp.container.image }}"
           dockerImageTag: ${runVarAppVersion}
           inputSteps:
             - name: setup_env
@@ -289,7 +289,7 @@ pipelines:
           onExecute:
             - sudo mkdir -p /etc/docker 
             - > 
-              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.FrontApp.container.registy }}\"]}" > /etc/docker/daemon.json
+              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.FrontApp.container.registry }}\"]}" > /etc/docker/daemon.json
             - sudo systemctl restart docker
             - sudo cat /etc/docker/daemon.json
             - sudo systemctl status docker
