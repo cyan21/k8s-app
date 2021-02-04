@@ -106,8 +106,6 @@ pipelines:
             - name: {{ .Values.FrontAppNpmResources.gitRepo.name }}
         execution:
           onStart:
-            # to inject CI URL into the build info
-            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
             # retrieved cached dependencies (stored onSucess execution)            
             - restore_cache_files npm_cache ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/node_modules
           onSuccess:
@@ -127,6 +125,7 @@ pipelines:
           affinityGroup: together
           environmentVariables:
             OFFLINE_MODE: "true"
+            JFROG_CLI_BUILD_URL: "${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
           inputSteps:
             - name: {{ .Values.FrontAppJSSteps.npmBuild.name }}
           integrations:
@@ -146,6 +145,7 @@ pipelines:
           onSuccess:
             - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
             - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
+            - jfrog rt bce {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
             - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
             - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
 
@@ -225,6 +225,7 @@ pipelines:
             - cd ${res_{{ .Values.FrontAppContainerResources.gitRepo.name }}_resourcePath}
             # get last commit on the dockerfile
             - add_run_variables runVarGitCommit=`git log -n 1 --pretty=format:%H -- front/CI/Docker/Dockerfile`
+            - add_run_variables runBranchName=${res_{{ .Values.FrontAppContainerResources.gitRepo.name }}_branchName}
       
       - name: {{ .Values.FrontAppContainerSteps.dockerPush.name }}
         type: DockerPush
@@ -239,6 +240,8 @@ pipelines:
           outputResources:
             - name: {{ .Values.FrontAppContainerResources.buildInfo.resourceName }}
         execution:
+          onStart:
+            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppContainerResources.buildInfo.name }}/${run_number}/setup_env?branch=${runBranchName}"
           onSuccess:
             - echo "{{ .Values.FrontApp.container.repoSource }}/${envVarAppName}/${runVarAppVersion}/manifest.json"
             - jfrog rt sp --build=${res_{{ .Values.FrontAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.FrontApp.container.repoSource }}/{{ .Values.FrontApp.container.image }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
