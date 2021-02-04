@@ -82,7 +82,7 @@ Chart:
 
 ChartResources:
   gitRepo:
-    name: src_code_helm
+    name: src_code_project
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
