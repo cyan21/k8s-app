@@ -227,7 +227,6 @@ pipelines:
             - sudo cat /etc/docker/daemon.json
           onExecute:
             - cd ${res_{{ .Values.ChartResources.gitRepo.name }}_resourcePath}/chart/content
-            - ls -l && chmod +x init.sh
             - echo ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
             - git branch
             - git checkout ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
