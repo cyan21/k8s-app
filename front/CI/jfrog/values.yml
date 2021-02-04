@@ -28,7 +28,7 @@ FrontAppNpmResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: jfrog-ode
+      include: demo
     files:
       exclude: '^front\/CI\/.+'
       include: '^front\/.+'
@@ -66,7 +66,7 @@ FrontAppContainerResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: jfrog-ode
+      include: demo
     files:
       include: '^front\/CI\/Docker\/.+'
   fileSpec:
@@ -107,7 +107,7 @@ FrontAppContainerDeployResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: 'jfrog-ode'
+      include: demo
     files:
       include: '^chart\/.+'
   helmChart:

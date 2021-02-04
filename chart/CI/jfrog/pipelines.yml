@@ -71,6 +71,18 @@ resources:
       buildOn:
          commit: false
 
+  - name: {{ .Values.ChartResources.gitRepoHelm.name }}
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.ChartResources.gitRepoHelm.gitProvider }}
+      path: {{ .Values.ChartResources.gitRepoHelm.path }}
+      branches:
+        include: {{ .Values.ChartResources.gitRepoHelm.branches.include }}
+      files: 
+        include: {{ .Values.ChartResources.gitRepoHelm.files.include }}
+      buildOn:
+         commit: false
+
   - name: {{ .Values.ChartResources.chart.name }}
     type: HelmChart
     configuration:
@@ -135,7 +147,7 @@ pipelines:
             - ls -l && chmod +x init.sh
             - echo ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
             - git branch
-            - git checkout jfrog-ode
+            - git checkout ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
             - git branch
             - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url/%artifactory/} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey}
       
@@ -202,8 +214,8 @@ pipelines:
           affinityGroup: helm
           runtime:
             type: host
-          # inputResources:
-          #   - name: {{ .Values.ChartResources.gitRepo.name }}
+          inputResources:
+            - name: {{ .Values.ChartResources.gitRepo.name }}
           integrations:
             - name: {{ .Values.Chart.artifactoryIntegration }}
         execution:
@@ -214,11 +226,11 @@ pipelines:
             - sudo systemctl restart docker
             - sudo cat /etc/docker/daemon.json
           onExecute:
-            - cd ${res_{{ .Values.InitResources.gitRepo.name }}_resourcePath}/chart/CI/jfrog
+            - cd ${res_{{ .Values.ChartResources.gitRepo.name }}_resourcePath}/chart/CI/jfrog
             - ls -l && chmod +x init.sh
-            - echo ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
+            - echo ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
             - git branch
-            - git checkout jfrog-ode
+            - git checkout ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
             - git branch
             - cd chart/content
             # path to manifest.json of each docker images referenced in the values.yaml
@@ -238,7 +250,7 @@ pipelines:
           lint: {{ .Values.ChartSteps.publishHelm.lint }}
           autoPublishBuildInfo: {{ .Values.ChartSteps.publishHelm.autoPublishBuildInfo }}
           inputResources:
-            - name: {{ .Values.ChartResources.gitRepo.name }}            
+            - name: {{ .Values.ChartResources.gitRepoHelm.name }}            
             - name: {{ .Values.ChartResources.fileSpec.front.name }}
             - name: {{ .Values.ChartResources.fileSpec.back.name }}
           inputSteps:
@@ -253,7 +265,7 @@ pipelines:
             - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
             - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
             - helm3 version
-            - cat ${res_{{ .Values.ChartResources.gitRepo.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
+            - cat ${res_{{ .Values.ChartResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
             # - sudo mkdir -p /etc/docker 
             # - > 
             #   sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.Init.container.registry }}\"]}" > /etc/docker/daemon.json

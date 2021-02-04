@@ -10,7 +10,6 @@ Init:
     repo: kaivengers-helm
     name: myapp
     version: 1.0.0
-
   artifactoryIntegration: artifactory_eu
 
 InitResources:
@@ -19,7 +18,7 @@ InitResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: jfrog-ode
+      include: demo
     files:
       include: ^chart\/CI\/jfrog\/.+
   gitRepoDocker:
@@ -27,7 +26,7 @@ InitResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: jfrog-ode
+      include: demo
     files:
       include: ^chart\/CI\/jfrog\/Dockerfile
   gitRepoHelm:
@@ -35,7 +34,7 @@ InitResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: jfrog-ode
+      include: demo
     files:
       include: ^chart\/content\/.+
   buildInfoContainer:
@@ -87,7 +86,15 @@ ChartResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: jfrog-ode
+      include: demo
+    files:
+      include: ^chart\/content\/.+
+  gitRepoHelm:
+    name: src_code_helm
+    gitProvider: yann_github
+    path: cyan21/k8s-app
+    branches:
+      include: demo
     files:
       include: ^chart\/content\/.+
   chart:
