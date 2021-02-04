@@ -107,13 +107,13 @@ pipelines:
         execution:
           onStart:
             # retrieved cached dependencies (stored onSucess execution)            
-            - restore_cache_files npm_cache ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/node_modules
+#            - restore_cache_files npm_cache ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/node_modules
           onSuccess:
             - add_run_variables runVarAppVersion=`jq -r ".version" ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/package.json`
             - echo $runVarAppVersion
             - add_run_variables runVarGitCommit=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_commitSha}
             # cache node_modules folder for future runs
-            - add_cache_files ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/node_modules npm_cache
+#            - add_cache_files ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/node_modules npm_cache
             # pass front folder to next step
             - add_run_files  ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }} mySources            
             # pass JFrog CLI tmp folder to next step
