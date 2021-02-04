@@ -199,6 +199,7 @@ pipelines:
             - cd ${res_{{ .Values.BackAppContainerResources.gitRepo.name }}_resourcePath}
             # get last commit on the dockerfile
             - add_run_variables runVarGitCommit=`git log -n 1 --pretty=format:%H -- back/CI/Docker/jfrog-Dockerfile`
+            - add_run_variables runBranchName=${res_{{ .Values.BackAppContainerResources.gitRepo.name }}_branchName
 
       - name: {{ .Values.BackAppContainerSteps.dockerPush.name }}
         type: DockerPush
@@ -213,6 +214,8 @@ pipelines:
           outputResources:
             - name: {{ .Values.BackAppContainerResources.buildInfo.resourceName }}
         execution:
+          onStart:
+            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.BackApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.BackAppContainerResources.buildInfo.name }}/${run_number}/setup_env?branch=${runBranchName}"
           onSuccess:
             - echo "{{ .Values.BackAppContainerSteps.dockerPush.artifactoryTargetRepoName }}/{{ .Values.BackAppContainerSteps.dockerBuild.imageName }}/${runVarAppVersion}/manifest.json"
             - jfrog rt sp --build=${res_{{ .Values.BackAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.BackAppContainerSteps.dockerPush.artifactoryTargetRepoName }}/{{ .Values.BackAppContainerSteps.dockerBuild.imageName }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
