@@ -232,6 +232,8 @@ pipelines:
             - git checkout ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
             - git branch
             # path to manifest.json of each docker images referenced in the values.yaml
+            - sudo curl -LO https://github.com/mikefarah/yq/releases/download/v4.4.0/yq_linux_amd64
+            - sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq && sudo yq --version
             - front_repo_path=`yq r values.yaml 'images.front.repository' |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
             - front_vers=`yq r values.yaml 'images.front.tag'`
             - back_repo_path=`yq r values.yaml 'images.back.repository' |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
