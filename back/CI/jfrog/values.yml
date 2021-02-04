@@ -15,6 +15,7 @@ BackApp:
     repoSource: kaizoku-docker-dev-local
     repoPromotion1: kaizoku-docker-rc-local
     repoPromotion2: kaizoku-docker-release-local
+    virtualRepo: kaizoku-docker
 
 ##########################################
 ## Gradle Pipeline
