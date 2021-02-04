@@ -26,7 +26,7 @@ BackAppGradleResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: 'jfrog-ode'
+      include: demo
     files:
       exclude: '^back\/CI\/.+'
       include: '^back\/.+'
@@ -66,7 +66,7 @@ BackAppContainerResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: 'jfrog-ode'
+      include: demo
     files:
       include: '^back\/CI\/Docker\/.+'
   fileSpec:
@@ -108,7 +108,7 @@ BackAppContainerDeployResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: 'jfrog-ode'
+      include: demo
     files:
       include: '^chart\/.+'
   helmChart:
