@@ -235,9 +235,11 @@ pipelines:
             - sudo curl -LO https://github.com/mikefarah/yq/releases/download/v4.4.0/yq_linux_amd64
             - sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq && sudo yq --version
             - front_repo_path=`yq eval '.images.front.repository' values.yaml  |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
-            - front_vers=`yq eval '.images.front.tag' values.yaml`
+            - echo $front_repo_path
+            - front_vers=`yq eval '.images.front.tag' values.yaml` && echo $front_vers
             - back_repo_path=`yq eval '.images.back.repository' values.yaml  |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
-            - back_vers=`yq eval '.images.back.tag' values.yaml`
+            - echo $back_repo_path
+            - back_vers=`yq eval '.images.back.tag' values.yaml` && echo back_vers
             - add_run_variables runVarFrontManifest=${front_repo_path}/${front_vers}/manifest.json
             - add_run_variables runVarBackManifest=${back_repo_path}/${back_vers}/manifest.json
       
