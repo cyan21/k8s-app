@@ -105,7 +105,7 @@ pipelines:
           inputResources:
             - name: {{ .Values.FrontAppNpmResources.gitRepo.name }}
         execution:
-          onStart:
+#          onStart:
             # retrieved cached dependencies (stored onSucess execution)            
 #            - restore_cache_files npm_cache ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/node_modules
           onSuccess:
