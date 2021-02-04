@@ -318,7 +318,7 @@ pipelines:
           inputResources:
             - name: {{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}
           releaseName: my-super-app
-          flags: "--debug --install --namespace {{ .Values.FrontApp.container.k8sNamespace }} --cleanup-on-fail --set images.front.tag=${runVarNewTag} --set images.front.repository={{ .Values.FrontApp.container.registry }}/{{ .Values.FrontApp.container.image }}"
+          flags: "--debug --install --namespace {{ .Values.FrontApp.k8sNamespace }} --cleanup-on-fail --set images.front.tag=${runVarNewTag} --set images.front.repository={{ .Values.FrontApp.container.registry }}/{{ .Values.FrontApp.container.image }}"
           valueFilePaths:
             - values.yaml
         execution:
