@@ -96,7 +96,7 @@ pipelines:
       - name: {{ .Values.FrontAppJSSteps.npmBuild.name }}
         type: NpmBuild
         configuration:
-          npmArgs: {{ .Values.FrontAppJSSteps.npmBuild.args }}
+          # npmArgs: {{ .Values.FrontAppJSSteps.npmBuild.args }}
           affinityGroup: together
           repositoryName: {{ .Values.FrontApp.js.repoNpmSource }}
           sourceLocation: {{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}
