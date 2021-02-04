@@ -246,8 +246,8 @@ pipelines:
       - name: {{ .Values.ChartSteps.publishHelm.name }}
         type: HelmPublish
         configuration:
-          environmentVariables:
-            JFROG_CLI_BUILD_URL: "${int_{{ .Values.Chart.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.ChartResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.ChartResources.gitRepoHelm.name }}_branchName"
+          # environmentVariables:
+          #   JFROG_CLI_BUILD_URL: "${int_{{ .Values.Chart.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.ChartResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.ChartResources.gitRepoHelm.name }}_branchName"
           affinityGroup: helm
           helmVersion: 3
           chartPath: {{ .Values.ChartSteps.publishHelm.path }}
@@ -272,7 +272,7 @@ pipelines:
             - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
             - helm3 version
             - cat ${res_{{ .Values.ChartResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
-           #c - export JFROG_CLI_BUILD_URL="${int_{{ .Values.Chart.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.ChartResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.ChartResources.gitRepoHelm.name }}_branchName"
+            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.Chart.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.ChartResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.ChartResources.gitRepoHelm.name }}_branchName"
             # - sudo mkdir -p /etc/docker 
             # - > 
             #   sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.Init.container.registry }}\"]}" > /etc/docker/daemon.json
