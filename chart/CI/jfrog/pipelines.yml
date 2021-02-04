@@ -226,18 +226,17 @@ pipelines:
             - sudo systemctl restart docker
             - sudo cat /etc/docker/daemon.json
           onExecute:
-            - cd ${res_{{ .Values.ChartResources.gitRepo.name }}_resourcePath}/chart/CI/jfrog
+            - cd ${res_{{ .Values.ChartResources.gitRepo.name }}_resourcePath}/chart/content
             - ls -l && chmod +x init.sh
             - echo ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
             - git branch
             - git checkout ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
             - git branch
-            - cd chart/content
             # path to manifest.json of each docker images referenced in the values.yaml
-            - front_repo_path=`yq r ../../content/values.yaml 'images.front.repository' |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
-            - front_vers=`yq r ../../content/values.yaml 'images.front.tag'`
-            - back_repo_path=`yq r ../../content/values.yaml 'images.back.repository' |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
-            - back_vers=`yq r ../../content/values.yaml 'images.back.tag'`
+            - front_repo_path=`yq r values.yaml 'images.front.repository' |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
+            - front_vers=`yq r values.yaml 'images.front.tag'`
+            - back_repo_path=`yq r values.yaml 'images.back.repository' |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
+            - back_vers=`yq r values.yaml 'images.back.tag'`
             - add_run_variables runVarFrontManifest=${front_repo_path}/${front_vers}/manifest.json
             - add_run_variables runVarBackManifest=${back_repo_path}/${back_vers}/manifest.json
       
@@ -262,6 +261,8 @@ pipelines:
             - name: {{ .Values.ChartResources.buildInfo.resourceName }}
         execution:
           onStart:
+            - echo ${runVarFrontManifest}
+            - echo ${runVarBackManifest}
             - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
             - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
             - helm3 version
