@@ -329,8 +329,8 @@ pipelines:
             - echo ${runVarNewTag}
             - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_chart}
             - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_version}
-            - add_run_variables runVarChartName=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_chart}
-            - add_run_variables runVarChartVersion=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_version}
+            - add_run_variables runVarChartName=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_chart}
+            - add_run_variables runVarChartVersion=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_version}
      
       - name: {{ .Values.FrontAppContainerDeploySteps.testing.name }}
         type: Bash
