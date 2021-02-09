@@ -271,8 +271,8 @@ pipelines:
             - sudo systemctl restart docker
             - sudo cat /etc/docker/daemon.json
             - sudo systemctl status docker
-            - echo ${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_docker_newTag}
-            - add_run_variables runVarNewTag=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_docker_newTag}
+            - echo ${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_newTag}
+            - add_run_variables runVarNewTag=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_newTag}
             - add_run_variables runVarBuildName=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_buildInfoName}
             - add_run_variables runVarBuildNumber=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_buildInfoNumber}
 
