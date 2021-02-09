@@ -327,8 +327,8 @@ pipelines:
         execution:
           onStart:
             - echo ${runVarNewTag}
-            - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_chart}
-            - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_version}
+            - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_chart}
+            - echo ${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_version}
             - add_run_variables runVarChartName=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_chart}
             - add_run_variables runVarChartVersion=${res_{{ .Values.FrontAppContainerDeployResources.helmChart.resourceName }}_js_version}
      
