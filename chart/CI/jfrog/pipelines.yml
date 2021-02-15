@@ -289,7 +289,9 @@ pipelines:
             # - sudo cat /etc/docker/daemon.json
             # HACK : bumping version in the Chart.yaml (should be done when pushing the code)
             - sudo curl -LO https://github.com/mikefarah/yq/releases/download/v4.4.0/yq_linux_amd64
-            - sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq && sudo yq --version            
+            - sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq && sudo yq --version
+            - ls -l ${res_{{ .Values.ChartResources.gitRepoHelm.name }}_resourcePath}/chart/content/Chart.yaml 
+            - exit 1           
             - yq eval '.version = "{{ .Values.Chart.version }}"' ${res_{{ .Values.ChartResources.gitRepoHelm.name }}_resourcePath}/chart/content/Chart.yaml
 
       - name: {{ .Values.ChartSteps.helmDeploy.name }}
