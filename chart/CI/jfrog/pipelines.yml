@@ -347,6 +347,8 @@ pipelines:
             - name: {{ .Values.ChartResources.buildInfoPromoted.resourceName }}
         execution:
           onSuccess:
-            - echo  "jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz \"image.back=${runVarBackImage};image.front=${runVarFrontImage}\""
-            - jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
+#            - echo  "jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz \"image.back=${runVarBackImage};image.front=${runVarFrontImage}\""
+#            - jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
+          # WORKAROUND FOR BUG 
+            - jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
 
