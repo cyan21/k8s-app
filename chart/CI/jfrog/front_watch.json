@@ -1,6 +1,6 @@
 {
     "general_data": {
-        "name": "avengers",
+        "name": "mars",
         "description": "This is a new watch created using API V2",
         "active": true
     },
@@ -8,7 +8,7 @@
         "resources": [
             {
                 "type": "repository",
-                "name": "avengers-npm-dev-local",
+                "name": "mars-npm-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -19,7 +19,7 @@
             },
             {
                 "type": "repository",
-                "name": "avengers-npm-rc-local",
+                "name": "mars-npm-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -30,7 +30,7 @@
             },
             {
                 "type": "repository",
-                "name": "avengers-docker-dev-local",
+                "name": "mars-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -41,7 +41,7 @@
             },
             {
                 "type": "repository",
-                "name": "avengers-docker-rc-local",
+                "name": "mars-docker-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -53,7 +53,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "avengers-npmjs-remote",
+                "name": "mars-npmjs-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -65,7 +65,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "avengers-dockerhub-remote",
+                "name": "mars-dockerhub-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {

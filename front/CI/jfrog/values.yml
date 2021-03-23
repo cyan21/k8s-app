@@ -2,21 +2,21 @@ FrontApp:
   pipelineName: k8s_frontapp_js
   pipelineContainerName: k8s_frontapp_js_docker
   pipelineDeployName: k8s_frontapp_js_deployment
-  projectName: avengers
+  projectName: mars
   appName: frontapp
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
-  k8sNamespace: kaivengers
+  k8sNamespace: saturn
   js:
-    repoNpmSource: avengers-npm
-    repoSource: avengers-generic
-    repoPromotion1: avengers-generic-rc-local
+    repoNpmSource: mars-npm
+    repoSource: mars-generic
+    repoPromotion1: mars-generic-rc-local
   container:
-    registry: avengers-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    registry: mars-docker.ot-demo.gcp.devopsacc.team:80
     image: frontapp-js
-    repoSource: avengers-docker
-    repoPromotion1: avengers-docker-rc-local
-    repoPromotion2: avengers-docker-release-local
+    repoSource: mars-docker
+    repoPromotion1: mars-docker-rc-local
+    repoPromotion2: mars-docker-release-local
 
 ##########################################
 ## NPM Pipeline
@@ -112,7 +112,7 @@ FrontAppContainerDeployResources:
       include: '^chart\/.+'
   helmChart:
     resourceName: hc_my_app_frontapp_js
-    repo: kaivengers-helm
+    repo: saturn-helm
     name: myapp
     version: 1.0.0
     

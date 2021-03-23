@@ -1,7 +1,7 @@
 
 {
     "general_data": {
-        "name": "kaizoku",
+        "name": "jupiter",
         "description": "This is a new watch created using API V2",
         "active": true
     },
@@ -9,7 +9,7 @@
         "resources": [
             {
                 "type": "repository",
-                "name": "kaizoku-grdl-dev-local",
+                "name": "jupiter-grdl-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -20,7 +20,7 @@
             },
             {
                 "type": "repository",
-                "name": "kaizoku-grdl-rc-local",
+                "name": "jupiter-grdl-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -31,7 +31,7 @@
             },
             {
                 "type": "repository",
-                "name": "kaizoku-docker-dev-local",
+                "name": "jupiter-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -42,7 +42,7 @@
             },
             {
                 "type": "repository",
-                "name": "kaizoku-docker-rc-local",
+                "name": "jupiter-docker-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -53,7 +53,7 @@
             },
             {
                 "type": "repository",
-                "name": "kaizoku-docker-dev-local",
+                "name": "jupiter-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -65,7 +65,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "kaizoku-jcenter-grdl-remote",
+                "name": "jupiter-jcenter-grdl-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -77,7 +77,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "kaizoku-dockerhub-remote",
+                "name": "jupiter-dockerhub-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {

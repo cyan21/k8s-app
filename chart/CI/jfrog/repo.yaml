@@ -1,22 +1,22 @@
 localRepositories:   
-  kaivengers-docker-release-local:
+  saturn-docker-release-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaivengers-helm-dev-local:
+  saturn-helm-dev-local:
     type: helm
     repoLayout: simple-default 
     xray:   
       enabled: false
-  kaivengers-helm-release-local:
+  saturn-helm-release-local:
     type: helm
     repoLayout: simple-default 
     xray:   
       enabled: false
 remoteRepositories: 
-  kaivengers-dockerhub-remote:
+  saturn-dockerhub-remote:
     type: docker 
     url: https://registry-1.docker.io/
     dockerApiVersion: V2
@@ -24,7 +24,7 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  kaivengers-bintray-remote:
+  saturn-bintray-remote:
     type: docker
     url: https://docker.bintray.io/
     dockerApiVersion: V2
@@ -32,27 +32,27 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  kaivengers-chartcenter-remote:
+  saturn-chartcenter-remote:
     type: helm
     url: https://repo.chartcenter.io/
     repoLayout: simple-default 
     xray:   
       enabled: false
 virtualRepositories: 
-  kaivengers-docker:
+  saturn-docker:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - kaivengers-docker-release-local
-      - kaivengers-dockerhub-remote
-      - kaivengers-bintray-remote
-    defaultDeploymentRepo: kaivengers-docker-release-local
-  kaivengers-helm:
+      - saturn-docker-release-local
+      - saturn-dockerhub-remote
+      - saturn-bintray-remote
+    defaultDeploymentRepo: saturn-docker-release-local
+  saturn-helm:
     type: helm
     repoLayout: simple-default 
     repositories:   
-      - kaivengers-helm-dev-local
-      - kaivengers-helm-release-local
-      - kaivengers-chartcenter-remote
-    defaultDeploymentRepo: kaivengers-helm-dev-local
+      - saturn-helm-dev-local
+      - saturn-helm-release-local
+      - saturn-chartcenter-remote
+    defaultDeploymentRepo: saturn-helm-dev-local

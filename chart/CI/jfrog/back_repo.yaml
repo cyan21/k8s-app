@@ -1,27 +1,27 @@
 localRepositories:   
-  kaizoku-grdl-dev-local:
+  jupiter-grdl-dev-local:
     type: gradle
     repoLayout: maven-2-default 
     xray:   
       enabled: true
-  kaizoku-grdl-rc-local:
+  jupiter-grdl-rc-local:
     type: gradle
     repoLayout: maven-2-default 
     xray:   
       enabled: true
-  kaizoku-docker-dev-local:
+  jupiter-docker-dev-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaizoku-docker-rc-local:
+  jupiter-docker-rc-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  kaizoku-docker-release-local:
+  jupiter-docker-release-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
@@ -39,13 +39,13 @@ localRepositories:
   #   xray:   
   #     enabled: true
 remoteRepositories: 
-  kaizoku-jcenter-grdl-remote:
+  jupiter-jcenter-grdl-remote:
     type: gradle 
     repoLayout: maven-2-default 
     url: https://jcenter.bintray.com 
     xray:   
       enabled: true
-  kaizoku-dockerhub-remote:
+  jupiter-dockerhub-remote:
     type: docker 
     url: https://registry-1.docker.io/
     dockerApiVersion: V2
@@ -53,7 +53,7 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  kaizoku-bintray-remote:
+  jupiter-bintray-remote:
     type: docker
     url: https://docker.bintray.io/
     dockerApiVersion: V2
@@ -68,23 +68,23 @@ remoteRepositories:
     xray:   
       enabled: false
 virtualRepositories: 
-  kaizoku-docker:
+  jupiter-docker:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - kaizoku-docker-dev-local
-      - kaizoku-docker-rc-local
-      - kaizoku-docker-release-local
-      - kaizoku-dockerhub-remote
-      - kaizoku-bintray-remote
+      - jupiter-docker-dev-local
+      - jupiter-docker-rc-local
+      - jupiter-docker-release-local
+      - jupiter-dockerhub-remote
+      - jupiter-bintray-remote
       - kaivengers-docker-release-local
-    defaultDeploymentRepo: kaizoku-docker-dev-local
-  kaizoku-grdl:
+    defaultDeploymentRepo: jupiter-docker-dev-local
+  jupiter-grdl:
     type: gradle
     repoLayout: maven-2-default 
     repositories:   
-      - kaizoku-grdl-dev-local
-      - kaizoku-grdl-rc-local
-      - kaizoku-jcenter-grdl-remote
-    defaultDeploymentRepo: kaizoku-grdl-dev-local
+      - jupiter-grdl-dev-local
+      - jupiter-grdl-rc-local
+      - jupiter-jcenter-grdl-remote
+    defaultDeploymentRepo: jupiter-grdl-dev-local

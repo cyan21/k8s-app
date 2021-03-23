@@ -1,13 +1,13 @@
 Init:
   pipelineName: k8s_project_init
   container:
-    registry: kaivengers-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    registry: saturn-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
-    repoSource: kaivengers-docker
+    repoSource: saturn-docker
     # repoPromotion1: kaizoku-docker-rc-local
   chart:
-    repo: kaivengers-helm
+    repo: saturn-helm
     name: myapp
     version: 1.0.0
   artifactoryIntegration: artifactory_eu
@@ -47,7 +47,7 @@ InitResources:
     resourceName: hc_my_app
     name: myapp
     version: 1.0.0
-    repo: kaivengers-helm
+    repo: saturn-helm
 
 InitSteps:
   publishHelm:
@@ -68,17 +68,17 @@ InitSteps:
 Chart:
   pipelineName: k8s_bump_helm_chart
   container:
-    registry: kaivengers-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    registry: saturn-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
-    repoSource: kaivengers-docker
-  repo: kaivengers-helm
-  repoPromotion1: kaivengers-helm-release-local
+    repoSource: saturn-docker
+  repo: saturn-helm
+  repoPromotion1: saturn-helm-release-local
   name: myapp
   version: 2.0.0
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
-  k8sNamespace: kaivengers
+  k8sNamespace: saturn
 
 ChartResources:
   gitRepo:

@@ -1,47 +1,47 @@
 localRepositories:   
-  avengers-npm-dev-local:
+  mars-npm-dev-local:
     type: npm
     repoLayout: npm-default 
     xray:   
       enabled: true
-  avengers-npm-rc-local:
+  mars-npm-rc-local:
     type: npm
     repoLayout: npm-default 
     xray:   
       enabled: true
-  avengers-generic-dev-local:
+  mars-generic-dev-local:
     type: generic
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-generic-rc-local:
+  mars-generic-rc-local:
     type: generic
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-docker-dev-local:
+  mars-docker-dev-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-docker-rc-local:
+  mars-docker-rc-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
-  avengers-docker-release-local:
+  mars-docker-release-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
 remoteRepositories: 
-  avengers-npmjs-remote:
+  mars-npmjs-remote:
     type: npm
     repoLayout: npm-default 
     url: https://registry.npmjs.org
     xray:   
       enabled: true
-  avengers-dockerhub-remote:
+  mars-dockerhub-remote:
     type: docker 
     url: https://registry-1.docker.io/
     dockerApiVersion: V2
@@ -49,7 +49,7 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  avengers-bintray-remote:
+  mars-bintray-remote:
     type: docker
     url: https://docker.bintray.io/
     dockerApiVersion: V2
@@ -58,30 +58,30 @@ remoteRepositories:
     xray:   
       enabled: true
 virtualRepositories: 
-  avengers-npm:
+  mars-npm:
     type: npm
     repoLayout: npm-default 
     repositories:   
-      - avengers-npm-dev-local
-      - avengers-npm-rc-local
-      - avengers-npmjs-remote
-    defaultDeploymentRepo: avengers-npm-dev-local
-  avengers-generic:
+      - mars-npm-dev-local
+      - mars-npm-rc-local
+      - mars-npmjs-remote
+    defaultDeploymentRepo: mars-npm-dev-local
+  mars-generic:
     type: generic
     repoLayout: simple-default 
     repositories:   
-      - avengers-generic-dev-local
-      - avengers-generic-rc-local
-    defaultDeploymentRepo: avengers-generic-dev-local
-  avengers-docker:
+      - mars-generic-dev-local
+      - mars-generic-rc-local
+    defaultDeploymentRepo: mars-generic-dev-local
+  mars-docker:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - avengers-docker-dev-local
-      - avengers-docker-rc-local
-      - avengers-docker-release-local
-      - avengers-dockerhub-remote
-      - avengers-bintray-remote
+      - mars-docker-dev-local
+      - mars-docker-rc-local
+      - mars-docker-release-local
+      - mars-dockerhub-remote
+      - mars-bintray-remote
       - kaivengers-docker-release-local
-    defaultDeploymentRepo: avengers-docker-dev-local
+    defaultDeploymentRepo: mars-docker-dev-local

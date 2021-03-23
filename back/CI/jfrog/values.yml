@@ -2,19 +2,19 @@ BackApp:
   pipelineName: k8s_backapp_gradle
   pipelineContainerName: k8s_backapp_gradle_docker
   pipelineDeployName: k8s_backapp_gradle_deployment
-  projectName: kaizoku
+  projectName: jupiter
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
-  k8sNamespace: kaivengers
+  k8sNamespace: saturn
   gradle:
-    repoSource: kaizoku-grdl
-    repoPromotion1: kaizoku-grdl-rc-local
+    repoSource: jupiter-grdl
+    repoPromotion1: jupiter-grdl-rc-local
   container:
-    registry: kaizoku-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    registry: jupiter-docker.iot-demo.gcp.devopsacc.team:80
     image: backapp-gradle
-    repoSource: kaizoku-docker
-    repoPromotion1: kaizoku-docker-rc-local
-    repoPromotion2: kaizoku-docker-release-local
+    repoSource: jupiter-docker
+    repoPromotion1: jupiter-docker-rc-local
+    repoPromotion2: jupiter-docker-release-local
 
 ##########################################
 ## Gradle Pipeline
@@ -113,7 +113,7 @@ BackAppContainerDeployResources:
       include: '^chart\/.+'
   helmChart:
     resourceName: hc_my_app_backapp_gradle
-    repo: kaivengers-helm
+    repo: saturn-helm
     name: myapp
     version: 1.0.0
     
