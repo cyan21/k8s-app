@@ -395,6 +395,14 @@ pipelines:
 
   - name: {{ .Values.BackApp.pipelineDistributionName }}
     steps:
+      - name: init distribution
+        type: Bash
+        configuration:
+          inputResources:
+            - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
+          outputResources:
+            - name: aql_distrib
+            
       - name: init_rb
         type: CreateReleaseBundle 
         configuration:
@@ -412,7 +420,6 @@ pipelines:
               * Bigfix 1
           inputResources:
             - name: aql_distrib
-            - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
           outputResources:
             - name: rb_helm_docker 
 
