@@ -147,7 +147,8 @@ pipelines:
             - ls -l && chmod +x init.sh
             - echo ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
             - git branch
-            - git checkout ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
+#            - git checkout ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
+            - git checkout demo
             - git branch
             - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url/%artifactory/} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey}
       
