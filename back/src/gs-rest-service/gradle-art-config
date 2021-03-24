@@ -2,9 +2,9 @@ version: 1
 type: gradle
 useWrapper: false
 resolver:
-  repo: kaizoku-grdl
+  repo: jupiter-grdl
   serverID: artifactory_eu
 deployer:
-  repo: kaizoku-grdl
+  repo: jupiter-grdl
   serverID: artifactory_eu
   deployMavenDescriptors: false
