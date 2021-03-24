@@ -61,7 +61,7 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  kaivengers-chartcenter-remote:
+  saturn-chartcenter-remote:
     type: helm
     url: https://repo.chartcenter.io/
     repoLayout: simple-default 
@@ -78,7 +78,7 @@ virtualRepositories:
       - jupiter-docker-release-local
       - jupiter-dockerhub-remote
       - jupiter-bintray-remote
-      - kaivengers-docker-release-local
+      - saturn-docker-release-local
     defaultDeploymentRepo: jupiter-docker-dev-local
   jupiter-grdl:
     type: gradle

@@ -83,5 +83,5 @@ virtualRepositories:
       - mars-docker-release-local
       - mars-dockerhub-remote
       - mars-bintray-remote
-      - kaivengers-docker-release-local
+      - saturn-docker-release-local
     defaultDeploymentRepo: mars-docker-dev-local

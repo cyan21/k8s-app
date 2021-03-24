@@ -1,7 +1,7 @@
 Init:
   pipelineName: k8s_project_init
   container:
-    registry: saturn-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    registry: saturn-docker.gcp.devopsacc.team
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
     repoSource: saturn-docker
@@ -68,7 +68,7 @@ InitSteps:
 Chart:
   pipelineName: k8s_bump_helm_chart
   container:
-    registry: saturn-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team:80
+    registry: saturn-docker.saturn-docker.gcp.devopsacc.team
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
     repoSource: saturn-docker
