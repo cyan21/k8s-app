@@ -408,12 +408,12 @@ pipelines:
           outputResources:
             - name: rb_helm_docker 
 
-  #     - name: distribute_helm_docker
-  #       type: DistributeReleaseBundle
-  #       configuration:
-  #         dryRun: true 
-  #         inputResources:
-  #           - name: rb_helm_docker 
-  #             trigger: true   
-  #           - name: rb_helm_docker 
-  #             trigger: true  
+      - name: distribute_helm_docker
+        type: DistributeReleaseBundle
+        configuration:
+          dryRun: true 
+          inputResources:
+            - name: rb_helm_docker 
+              trigger: true   
+            - name: rb_helm_docker 
+              trigger: true  
