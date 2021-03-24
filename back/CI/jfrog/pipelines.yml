@@ -385,28 +385,28 @@ pipelines:
             - write_output {{ .Values.BackAppContainerDeployResources.propertyBag.name }} imageTag=${runVarNewTag}
             - write_output {{ .Values.BackAppContainerDeployResources.propertyBag.name }} imageName={{ .Values.BackApp.container.image }}
 
-  # - name: {{ .Values.BackApp.pipelineDistributionName }}
-  #   steps:
-  #     - name: init_rb
-  #       type: CreateReleaseBundle 
-  #       configuration:
-  #         releaseBundleName: {{ .Values.BackApp.releaseBundleName }} 
-  #         releaseBundleVersion: ${runVarAppVersion} 
-  #         dryRun: false
-  #         sign: true 
-  #         description: automatic creation 
-  #         releaseNotes:
-  #           syntax: markdown
-  #           content: |
-  #             # Description 
-  #             super release 
-  #             * Feature 1 
-  #             * Bigfix 1
-  #         inputResources:
-  #           - name: aql_distrib
-  #           - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
-  #         outputResources:
-  #           - name: rb_helm_docker 
+  - name: {{ .Values.BackApp.pipelineDistributionName }}
+    steps:
+      - name: init_rb
+        type: CreateReleaseBundle 
+        configuration:
+          releaseBundleName: {{ .Values.BackApp.releaseBundleName }} 
+          releaseBundleVersion: ${runVarAppVersion} 
+          dryRun: false
+          sign: true 
+          description: automatic creation 
+          releaseNotes:
+            syntax: markdown
+            content: |
+              # Description 
+              super release 
+              * Feature 1 
+              * Bigfix 1
+          inputResources:
+            - name: aql_distrib
+            - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
+          outputResources:
+            - name: rb_helm_docker 
 
   #     - name: distribute_helm_docker
   #       type: DistributeReleaseBundle
