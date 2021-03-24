@@ -395,14 +395,17 @@ pipelines:
 
   - name: {{ .Values.BackApp.pipelineDistributionName }}
     steps:
-      - name: init distribution
+      - name: init_distribution
         type: Bash
         configuration:
           inputResources:
             - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
           outputResources:
             - name: aql_distrib
-            
+        execution:
+          onExecute:
+            - echo "init distribution"
+
       - name: init_rb
         type: CreateReleaseBundle 
         configuration:
