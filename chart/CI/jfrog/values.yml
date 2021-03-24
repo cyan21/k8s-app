@@ -74,7 +74,8 @@ Chart:
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
     repoSource: saturn-docker-release-local
-#  repo: saturn-helm
+  # used by the Helm Chart resource
+  repo: saturn-helm
   repoPromotion1: saturn-helm-release-local
   name: myapp
   version: 2.0.0
