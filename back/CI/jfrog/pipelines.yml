@@ -89,6 +89,11 @@ resources:
       chart: {{ .Values.BackAppContainerDeployResources.helmChart.name }}
       version: {{ .Values.BackAppContainerDeployResources.helmChart.version }}
 
+  - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
+    type: PropertyBag
+    configuration:
+      newTag: XXX
+
 ###### DISTRIBUTION
 
   - name: aql_distrib
@@ -111,7 +116,7 @@ resources:
           input: "{{ .Values.BackApp.helm.repoPromotion1 }}/(.*)"
           output: "helm-local/$1"
 
-  - name: dr_mvn_debian 
+  - name: dr_helm_docker 
     type: DistributionRule
     configuration:
       sourceDistribution: distribution_eu
