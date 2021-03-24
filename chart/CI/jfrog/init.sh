@@ -62,5 +62,3 @@ echo -e "\n[XRAY] creating watch for frontend ... !"
 curl -XPOST $creds \
     -H "Content-Type: application/json" -d @front_watch.json \
     $JPD_URL/xray/api/v2/watches
-
-
