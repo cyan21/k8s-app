@@ -2,6 +2,8 @@ BackApp:
   pipelineName: k8s_backapp_gradle
   pipelineContainerName: k8s_backapp_gradle_docker
   pipelineDeployName: k8s_backapp_gradle_deployment
+  pipelineDistributeName: k8s_backapp_gradle_distribute
+  releaseBundleName: iot-demo
   projectName: jupiter
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
@@ -15,6 +17,9 @@ BackApp:
     repoSource: jupiter-docker
     repoPromotion1: jupiter-docker-rc-local
     repoPromotion2: jupiter-docker-release-local
+  helm:
+    repoSource: saturn-helm
+    repoPromotion1: saturn-helm-release-local
 
 ##########################################
 ## Gradle Pipeline
@@ -116,7 +121,9 @@ BackAppContainerDeployResources:
     repo: saturn-helm
     name: myapp
     version: 1.0.0
-    
+  propertyBag: 
+    name: pb_hc_my_app_backapp_gradle
+
 BackAppContainerDeploySteps:
   helmDeploy:
     name: deploy_helm_chart

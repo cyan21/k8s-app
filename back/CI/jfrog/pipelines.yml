@@ -89,6 +89,37 @@ resources:
       chart: {{ .Values.BackAppContainerDeployResources.helmChart.name }}
       version: {{ .Values.BackAppContainerDeployResources.helmChart.version }}
 
+###### DISTRIBUTION
+
+  - name: aql_distrib
+    type: Aql
+    configuration:
+      sourceArtifactory: artifactory_eu
+      query: > 
+        items.find({
+        "$and": [
+        {"@app.version": "${runVarAppVersion}"},
+        {"@app.name": "{{ .Values.BackApp.projectName }}"}
+        ]})
+      addedProperties:
+        distribution: "automatic"
+      mappings:
+        - name: docker
+          input: "{{ .Values.BackApp.container.repoPromotion2 }}/(.*)"
+          output: "docker-local/$1"
+        - name: helm
+          input: "{{ .Values.BackApp.helm.repoPromotion1 }}/(.*)"
+          output: "helm-local/$1"
+
+  - name: dr_mvn_debian 
+    type: DistributionRule
+    configuration:
+      sourceDistribution: distribution_eu
+      serviceName: "*"         
+      siteName: "*"
+      cityName: "*"
+      countryCodes:
+        - "wattoo"
 
 pipelines:
   - name: {{ .Values.BackApp.pipelineName }}
@@ -168,11 +199,11 @@ pipelines:
             - name: {{ .Values.BackAppGradleResources.propertyBag.name }}
         execution:
           onExecute:
-            - sudo mkdir -p /etc/docker 
-            - > 
-              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackApp.container.registry }}\"]}" > /etc/docker/daemon.json
-            - sudo systemctl restart docker
-            - sudo cat /etc/docker/daemon.json
+            # - sudo mkdir -p /etc/docker 
+            # - > 
+            #   sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackApp.container.registry }}\"]}" > /etc/docker/daemon.json
+            # - sudo systemctl restart docker
+            # - sudo cat /etc/docker/daemon.json
             - add_run_variables runVarAppVersion=${res_{{ .Values.BackAppGradleResources.propertyBag.name }}_appVersion}
             - add_run_variables runVarAppCommitSHA=${res_{{ .Values.BackAppGradleResources.propertyBag.name }}_appCommitSHA}
 
@@ -265,12 +296,12 @@ pipelines:
             - name: {{ .Values.BackAppContainerResources.propertyBag.name }}
         execution:
           onExecute:
-            - sudo mkdir -p /etc/docker 
-            - > 
-              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackApp.container.registry }}\"]}" > /etc/docker/daemon.json
-            - sudo systemctl restart docker
-            - sudo cat /etc/docker/daemon.json
-            - sudo systemctl status docker
+            # - sudo mkdir -p /etc/docker 
+            # - > 
+            #   sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackApp.container.registry }}\"]}" > /etc/docker/daemon.json
+            # - sudo systemctl restart docker
+            # - sudo cat /etc/docker/daemon.json
+            # - sudo systemctl status docker
             - echo ${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_newTag}
             - add_run_variables runVarNewTag=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_newTag}
             - add_run_variables runVarBuildName=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_buildInfoName}
@@ -331,6 +362,8 @@ pipelines:
             - name: {{ .Values.BackApp.artifactoryIntegration }}
           inputSteps:
             - name: {{ .Values.BackAppContainerDeploySteps.testing.name }}
+          outputResources:
+            - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
         execution:
           onExecute:
             - echo ${runVarChartName}
@@ -344,3 +377,38 @@ pipelines:
           onSuccess:
             - echo  "jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.BackApp.container.repoPromotion2 }}/{{ .Values.BackApp.container.image }}/${runVarNewTag}/manifest.json \"validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}\""
             - jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.BackApp.container.repoPromotion2 }}/{{ .Values.BackApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
+            - write_output {{ .Values.BackAppContainerDeployResources.propertyBag.name }} imageTag=${runVarNewTag}
+            - write_output {{ .Values.BackAppContainerDeployResources.propertyBag.name }} imageName={{ .Values.BackApp.container.image }}
+
+  - name: {{ .Values.BackApp.pipelineDistributionName }}
+    steps:
+      - name: init_rb
+        type: CreateReleaseBundle 
+        configuration:
+          releaseBundleName: {{ .Values.BackApp.releaseBundleName }} 
+          releaseBundleVersion: ${runVarAppVersion} 
+          dryRun: false
+          sign: true 
+          description: automatic creation 
+          releaseNotes:
+            syntax: markdown
+            content: |
+              # Description 
+              super release 
+              * Feature 1 
+              * Bigfix 1
+          inputResources:
+            - name: aql_distrib
+            - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
+          outputResources:
+            - name: rb_helm_docker 
+
+      - name: distribute_helm_docker
+        type: DistributeReleaseBundle
+        configuration:
+          dryRun: true 
+          inputResources:
+            - name: rb_helm_docker 
+              trigger: true   
+            - name: rb_helm_docker 
+              trigger: true  
