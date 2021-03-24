@@ -27,6 +27,9 @@ fi
 
 creds="-u$ADMIN_USER:$ADMIN_PASS"
 
+echo "Art URL : $JPD_URL"
+echo "creds : $creds"
+
 # create repo
 echo "[ARTIFACTORY] creating repositories for chart..."
 curl -XPATCH $creds \
