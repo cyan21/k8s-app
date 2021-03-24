@@ -96,6 +96,14 @@ resources:
 
 ###### DISTRIBUTION
 
+  - name: rb_helm_docker
+    type: ReleaseBundle
+    configuration:
+      sourceDistribution: distribution_eu
+      name: {{ .Values.BackApp.releaseBundleName }}
+      version: "1"          # will be overriden by the CreateReleaseBundle step 
+      isSigned: true
+
   - name: aql_distrib
     type: Aql
     configuration:
@@ -413,7 +421,7 @@ pipelines:
         configuration:
           dryRun: true 
           inputResources:
-            - name: rb_helm_docker 
+            - name: dr_helm_docker 
               trigger: true   
             - name: rb_helm_docker 
               trigger: true  
