@@ -4,7 +4,8 @@ Init:
     registry: iot-demo.gcp.devopsacc.team:80/saturn-docker
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
-    repoSource: saturn-docker
+    # repoSource and repoPromotion have to be local repo (due to the JFrog CLI limitation)
+    repoSource: saturn-docker-release-local
     # repoPromotion1: kaizoku-docker-rc-local
   chart:
     repo: saturn-helm
@@ -67,12 +68,13 @@ InitSteps:
 
 Chart:
   pipelineName: k8s_bump_helm_chart
+  # WORKAROUND TO MAKE HELM 3 WORK : SHOULD BE REMOVED IN THE LATEST VERSIONS
   container:
     registry: iot-demo.gcp.devopsacc.team:80/saturn-docker
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
-    repoSource: saturn-docker
-  repo: saturn-helm
+    repoSource: saturn-docker-release-local
+#  repo: saturn-helm
   repoPromotion1: saturn-helm-release-local
   name: myapp
   version: 2.0.0

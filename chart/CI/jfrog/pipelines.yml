@@ -298,6 +298,7 @@ pipelines:
           environmentVariables:
             JFROG_CLI_LOG_LEVEL: DEBUG
           helmVersion: 3
+          # WORKAROUND TO MAKE HELM 3 WORK : SHOULD BE REMOVED IN THE LATEST VERSIONS
           runtime:
             type: image
             image:
