@@ -10,11 +10,11 @@ BackApp:
   k8sNamespace: saturn
   gradle:
     repoSource: jupiter-grdl
-    repoPromotion1: jupiter-grdl-rc-local
+    repoPromotion1: jupiter-grdl-release-local
   container:
     registry: jupiter-docker.iot-demo.gcp.devopsacc.team:80
     image: backapp-gradle
-    repoSource: jupiter-docker
+    repoSource: jupiter-docker-dev-local
     repoPromotion1: jupiter-docker-rc-local
     repoPromotion2: jupiter-docker-release-local
   helm:

@@ -245,6 +245,7 @@ pipelines:
             - add_run_variables runVarGitCommit=`git log -n 1 --pretty=format:%H -- back/CI/Docker/jfrog-Dockerfile`
             - add_run_variables runBranchName=${res_{{ .Values.BackAppContainerResources.gitRepo.name }}_branchName}
             - echo $runBranchName
+            - jfrog --version
 
       - name: {{ .Values.BackAppContainerSteps.dockerPush.name }}
         type: DockerPush
