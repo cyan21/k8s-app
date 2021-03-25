@@ -1,6 +1,7 @@
 Init:
   pipelineName: k8s_project_init
   container:
+    # for Docker build
     registry: iot-demo.gcp.devopsacc.team:80/saturn-docker
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
