@@ -111,8 +111,8 @@ resources:
       query: > 
         items.find({
         "$and": [
-        {"@app.version": "${runVarAppVersion}"},
-        {"@app.name": "{{ .Values.BackApp.projectName }}"}
+        {"@docker.manifest": "${runVarImageTag}"},
+        {"@docker.repoName": "${runVarImageName}"}
         ]})
       addedProperties:
         distribution: "automatic"
@@ -406,6 +406,8 @@ pipelines:
         execution:
           onExecute:
             - echo "init distribution"
+            - add_run_variables runVarImageTag=${res_{{ .Values.BackAppContainerDeployResources.propertyBag.name }}_imageTag}
+            - add_run_variables runVarImageName=${res_{{ .Values.BackAppContainerDeployResources.propertyBag.name }}_imageName}
 
       - name: init_rb
         type: CreateReleaseBundle 

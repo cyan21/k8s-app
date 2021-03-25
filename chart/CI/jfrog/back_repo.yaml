@@ -9,6 +9,11 @@ localRepositories:
     repoLayout: maven-2-default 
     xray:   
       enabled: true
+  jupiter-grdl-release-local:
+    type: gradle
+    repoLayout: maven-2-default 
+    xray:   
+      enabled: true
   jupiter-docker-dev-local:
     type: docker
     dockerApiVersion: V2
@@ -86,5 +91,6 @@ virtualRepositories:
     repositories:   
       - jupiter-grdl-dev-local
       - jupiter-grdl-rc-local
+      - jupiter-grdl-release-local
       - jupiter-jcenter-grdl-remote
     defaultDeploymentRepo: jupiter-grdl-dev-local
