@@ -414,7 +414,7 @@ pipelines:
         type: CreateReleaseBundle 
         configuration:
           releaseBundleName: {{ .Values.BackApp.releaseBundleName }} 
-          releaseBundleVersion: ${runVarAppVersion} 
+          releaseBundleVersion: ${runVarImageTag} 
           dryRun: false
           sign: true 
           description: automatic creation 
