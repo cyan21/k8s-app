@@ -133,7 +133,7 @@ resources:
       siteName: "*"
       cityName: "*"
       countryCodes:
-        - "wattoo"
+        - "US"
 
 pipelines:
   - name: {{ .Values.BackApp.pipelineName }}
