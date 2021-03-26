@@ -57,7 +57,7 @@ resources:
       version: {{ .Values.InitResources.chart.version }}
 
 
-##########
+########## HELM 
 
   - name: {{ .Values.ChartResources.gitRepo.name }}
     type: GitRepo
@@ -120,6 +120,58 @@ resources:
       sourceArtifactory: {{ .Values.Chart.artifactoryIntegration }}
       buildName: {{ .Values.ChartResources.buildInfo.name }}
       buildNumber: ${run_number} 
+
+########## DISTRIBUTE 
+
+  - name: {{ .Values.ChartResources.releaseBundle.resourceName }} 
+    type: ReleaseBundle
+    configuration:
+      sourceDistribution: {{ .Values.Chart.distributionIntegration }}
+      name: {{ .Values.ChartResources.releaseBundle.name }}
+      version: "1"          # will be overriden by the CreateReleaseBundle step 
+      isSigned: true
+
+  - name: {{ .Values.ChartResources.aqlDistribution.name }}
+    type: Aql
+    configuration:
+      sourceArtifactory: {{ .Values.Chart.artifactoryIntegration }}
+      query: > 
+        items.find({ 
+        "$or": [ 
+          {
+            "repo": "{{ .Values.Chart.repoPromotion1 }}",
+            "@chart.name": "{{ .Values.Chart.name }}" , 
+            "@chart.version": "{{ .Values.Chart.version }}" 
+          },
+          {
+            "@validation.chart.name": "{{ .Values.Chart.name }}" , 
+            "@validation.chart.version": "{{ .Values.Chart.version }}" 
+          }
+          }]
+      addedProperties:
+        distribution: "automatic"
+      mappings:
+        - name: back
+          input: "{{ .Values.BackApp.container.repoPromotion2 }}/(.*)"
+          output: "docker-local/$1"
+        - name: front
+          input: "{{ .Values.BackApp.container.repoPromotion2 }}/(.*)"
+          output: "docker-local/$1"
+        - name: helm
+          input: "{{ .Values.BackApp.container.repoPromotion2 }}/(.*)"
+          output: "docker-local/$1"
+
+  - name: {{ .Values.ChartResources.distributionRule.name }} 
+    type: DistributionRule
+    configuration:
+      sourceDistribution: {{ .Values.Chart.distributionIntegration }}
+      serviceName: {{ .Values.ChartResources.distributionRule.serviceName }}          
+      siteName: {{ .Values.ChartResources.distributionRule.siteName }} 
+      cityName: {{ .Values.ChartResources.distributionRule.cityName }} 
+      countryCodes:
+        - {{ .Values.ChartResources.distributionRule.countryCodes }} 
+
+
 
 pipelines:
 ## INIT PIPELINE
@@ -219,12 +271,6 @@ pipelines:
           integrations:
             - name: {{ .Values.Chart.artifactoryIntegration }}
         execution:
-          onStart:
-            - sudo mkdir -p /etc/docker 
-            - > 
-              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.Init.container.registry }}\"]}" > /etc/docker/daemon.json
-            - sudo systemctl restart docker
-            - sudo cat /etc/docker/daemon.json
           onExecute:
             - cd ${res_{{ .Values.ChartResources.gitRepo.name }}_resourcePath}/chart/content
             - echo ${res_{{ .Values.ChartResources.gitRepo.name }}_branchName}
@@ -251,7 +297,6 @@ pipelines:
             - add_run_variables runVarFrontImage=${front_img_name}/${front_vers}
             - add_run_variables runVarBackImage=${back_img_name}/${back_vers}
 
-      
       - name: {{ .Values.ChartSteps.publishHelm.name }}
         type: HelmPublish
         configuration:
@@ -282,12 +327,9 @@ pipelines:
             - helm3 version
             - cat ${res_{{ .Values.ChartResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
             - export JFROG_CLI_BUILD_URL="${int_{{ .Values.Chart.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.ChartResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.ChartResources.gitRepoHelm.name }}_branchName}"
-            # - sudo mkdir -p /etc/docker 
-            # - > 
-            #   sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.Init.container.registry }}\"]}" > /etc/docker/daemon.json
-            # - sudo systemctl restart docker
-            # - sudo cat /etc/docker/daemon.json
+ ############################################################################################
             # HACK : bumping version in the Chart.yaml (should be done when pushing the code)
+  ###########################################################################################
             - sudo curl -LO https://github.com/mikefarah/yq/releases/download/v4.4.0/yq_linux_amd64
             - sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq && sudo yq --version
             - yq eval '.version = "{{ .Values.Chart.version }}"' -i ${res_{{ .Values.ChartResources.gitRepoHelm.name }}_resourcePath}/chart/content/Chart.yaml
@@ -346,10 +388,42 @@ pipelines:
             - name: {{ .Values.ChartSteps.testing.name }}
           outputResources:
             - name: {{ .Values.ChartResources.buildInfoPromoted.resourceName }}
+            - name: {{ .Values.ChartResources.aqlDistribution.name }}
         execution:
           onSuccess:
 #            - echo  "jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz \"image.back=${runVarBackImage};image.front=${runVarFrontImage}\""
 #            - jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
           # WORKAROUND FOR BUG 
             - jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
+            - jfrog rt sp ${runVarFrontManifest} "validation.chart.version={{ .Values.Chart.version }}" 
+            - jfrog rt sp ${runVarBackManifest} "validation.chart.version={{ .Values.Chart.version }}" 
 
+      - name: {{ .Values.ChartSteps.initRB.name }}
+        type: CreateReleaseBundle 
+        configuration:
+          releaseBundleName: {{ .Values.ChartResources.releaseBundle.name }} 
+          releaseBundleVersion: ${runVarImageTag} 
+          dryRun: false
+          sign: true 
+          description: automatic creation 
+          releaseNotes:
+            syntax: markdown
+            content: |
+              # Description 
+              super release 
+              * Feature 1 
+              * Bigfix 1
+          inputResources:
+            - name: {{ .Values.ChartResources.aqlDistribution.name }}
+          outputResources:
+            - name: {{ .Values.ChartResources.releaseBundle.resourceName }}
+
+      - name: {{ .Values.ChartSteps.distributeRB.name }}
+        type: DistributeReleaseBundle
+        configuration:
+          dryRun: true 
+          inputResources:
+            - name: {{ .Values.ChartResources.distributionRule.resourceName }}
+              trigger: true   
+            - name: {{ .Values.ChartResources.releaseBundle.resourceName }} 
+              trigger: true  

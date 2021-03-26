@@ -69,7 +69,9 @@ InitSteps:
 
 Chart:
   pipelineName: k8s_bump_helm_chart
-  # WORKAROUND TO MAKE HELM 3 WORK : SHOULD BE REMOVED IN THE LATEST VERSIONS
+  # It's either Chart + Docker OR Docker distribution (see back/CI/jfrog/pipelines/values/yml  > BackApp.distribute)
+  distribute: true
+  # TO DO  : REMOVE THE CUSTOM IMAGE IN THE LATEST VERSION OF PIPELINE
   container:
     registry: iot-demo.gcp.devopsacc.team:80/saturn-docker
     image: jfrog/pipelines-u18node
@@ -83,6 +85,7 @@ Chart:
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
   k8sNamespace: saturn
+  distributionIntegration: distribution_eu
 
 ChartResources:
   gitRepo:
@@ -113,7 +116,18 @@ ChartResources:
       name: fs_front_docker_manifest
     back:
       name: fs_back_docker_manifest
-
+  releaseBundle:
+    resourceName: rb_helm_docker_release
+    name: myapp
+  aqlDistribution:
+    name: aql_distrib_release
+  disributionRule:
+    name: dr_helm_docker_release
+    serviceName: "*"
+    siteName: "*"
+    cityName: "*"
+    countryCodes: "US"
+    
 ChartSteps:
   publishHelm:
     name: publish_helm_chart
@@ -130,3 +144,7 @@ ChartSteps:
     status: TEST_OK
     comment: passed non regression test
     copy: false
+  initRB:
+    name: init_release_bundle
+  distributeRB:
+    name: distribute_release_bundle
