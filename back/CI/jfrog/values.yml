@@ -3,6 +3,7 @@ BackApp:
   pipelineContainerName: k8s_backapp_gradle_docker
   pipelineDeployName: k8s_backapp_gradle_deployment
   pipelineDistributionName: k8s_backapp_gradle_distribute
+  distribute: false
   releaseBundleName: iot-demo
   projectName: jupiter
   artifactoryIntegration: artifactory_eu

@@ -94,7 +94,9 @@ resources:
     configuration:
       newTag: XXX
 
-###### DISTRIBUTION
+###### DISTRIBUTION 
+
+{{- if .Values.BackApp.distribute }}
 
   - name: rb_helm_docker
     type: ReleaseBundle
@@ -121,9 +123,6 @@ resources:
         - name: docker
           input: "{{ .Values.BackApp.container.repoPromotion2 }}/(.*)"
           output: "docker-local/$1"
-        # - name: helm
-        #   input: "{{ .Values.BackApp.helm.repoPromotion1 }}/(.*)"
-        #   output: "helm-local/$1"
 
   - name: dr_helm_docker 
     type: DistributionRule
@@ -134,6 +133,10 @@ resources:
       cityName: "*"
       countryCodes:
         - "US"
+ {{- end }}
+
+
+
 
 pipelines:
   - name: {{ .Values.BackApp.pipelineName }}
@@ -377,8 +380,10 @@ pipelines:
             - name: {{ .Values.BackApp.artifactoryIntegration }}
           inputSteps:
             - name: {{ .Values.BackAppContainerDeploySteps.testing.name }}
+          {{- if .Values.BackApp.distribute }}
           outputResources:
             - name: {{ .Values.BackAppContainerDeployResources.propertyBag.name }}
+          {{- end }}
         execution:
           onExecute:
             - echo ${runVarChartName}
@@ -394,7 +399,8 @@ pipelines:
             - jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.BackApp.container.repoPromotion2 }}/{{ .Values.BackApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
             - write_output {{ .Values.BackAppContainerDeployResources.propertyBag.name }} imageTag=${runVarNewTag}
             - write_output {{ .Values.BackAppContainerDeployResources.propertyBag.name }} imageName={{ .Values.BackApp.container.image }}
-
+          
+{{- if .Values.BackApp.distribute }}
   - name: {{ .Values.BackApp.pipelineDistributionName }}
     steps:
       - name: init_distribution
@@ -439,3 +445,4 @@ pipelines:
               trigger: true   
             - name: rb_helm_docker 
               trigger: true  
+{{- end }}
