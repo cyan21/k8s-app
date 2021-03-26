@@ -121,13 +121,13 @@ ChartResources:
     name: myapp
   aqlDistribution:
     name: aql_distrib_release
-  disributionRule:
+  distributionRule:
     name: dr_helm_docker_release
     serviceName: "*"
     siteName: "*"
     cityName: "*"
     countryCodes: "US"
-    
+
 ChartSteps:
   publishHelm:
     name: publish_helm_chart
