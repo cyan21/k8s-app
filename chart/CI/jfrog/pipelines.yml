@@ -423,7 +423,7 @@ pipelines:
         configuration:
           dryRun: true 
           inputResources:
-            - name: {{ .Values.ChartResources.distributionRule.resourceName }}
+            - name: {{ .Values.ChartResources.distributionRule.name }}
               trigger: true   
             - name: {{ .Values.ChartResources.releaseBundle.resourceName }} 
               trigger: true  
