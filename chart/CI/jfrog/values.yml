@@ -123,9 +123,9 @@ ChartResources:
     name: aql_distrib_release
   distributionRule:
     name: dr_helm_docker_release
-    serviceName: "*"
-    siteName: "*"
-    cityName: "*"
+    serviceName: '*'
+    siteName: '*'
+    cityName: '*'
     countryCodes: "US"
 
 ChartSteps:

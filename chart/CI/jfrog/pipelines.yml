@@ -165,9 +165,9 @@ resources:
     type: DistributionRule
     configuration:
       sourceDistribution: {{ .Values.Chart.distributionIntegration }}
-      serviceName: {{ .Values.ChartResources.distributionRule.serviceName }}          
-      siteName: {{ .Values.ChartResources.distributionRule.siteName }} 
-      cityName: {{ .Values.ChartResources.distributionRule.cityName }} 
+      serviceName: "{{ .Values.ChartResources.distributionRule.serviceName }}"          
+      siteName: "{{ .Values.ChartResources.distributionRule.siteName }}" 
+      cityName: "{{ .Values.ChartResources.distributionRule.cityName }}" 
       countryCodes:
         - {{ .Values.ChartResources.distributionRule.countryCodes }} 
 
