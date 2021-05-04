@@ -165,7 +165,12 @@ pipelines:
       #       - curl -fL https://getcli.jfrog.io | sh && ls -l           
       #       - mv ./jfrog "$cli_path/" && ls -l "$cli_path/jfrog"  && jfrog --version
             - export JFROG_CLI_BUILD_URL="${int_{{ .Values.BackApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.BackAppGradleResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_branchName}"
-            - sed s/GRADLE_REPO/{{ .Values.BackApp.gradle.repoSource }}/ ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/CI/jfrog/gradle-art-config | sed s/ARTIFACTORY_ID/{{ .Values.BackApp.artifactoryIntegration }} > ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/src/gs-rest-service/gradle-art-config
+            - >
+              echo source = ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/CI/jfrog/gradle-art-config 
+              ls -l ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/CI/jfrog/gradle-art-config 
+              echo dest = ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/src/gs-rest-service/gradle-art-config
+              ls -l ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/src/gs-rest-service/gradle-art-config
+            - sed "s/GRADLE_REPO/{{ .Values.BackApp.gradle.repoSource }}/" ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/CI/jfrog/gradle-art-config | sed "s/ARTIFACTORY_ID/{{ .Values.BackApp.artifactoryIntegration }}/" > ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/src/gs-rest-service/gradle-art-config
             - cat ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/src/gs-rest-service/gradle-art-config
           onSuccess:
             - add_run_variables runVarAppVersion=`sed -n "s/currentVersion=\(.*\)/\1/p" ${res_{{ .Values.BackAppGradleResources.gitRepo.name }}_resourcePath}/back/src/gs-rest-service/gradle.properties`
