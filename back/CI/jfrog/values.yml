@@ -14,7 +14,7 @@ BackApp:
     repoPromotion1: jpt-grdl-release-local
   container:
     # for Docker build
-    registry: iot-soleng-stg.gcp.devopsacc.team:80/jpt-docker
+    registry: platform-us.staging.gcp.devopsacc.team/jpt-docker
     image: backapp-gradle
     # for Docker push (which calls the JFrog CLI set props => only accept local repo)
     repoSource: jpt-docker-dev-local

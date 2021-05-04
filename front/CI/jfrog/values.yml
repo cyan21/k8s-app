@@ -12,7 +12,7 @@ FrontApp:
     repoSource: mrs-generic
     repoPromotion1: mrs-generic-rc-local
   container:
-    registry: mrs-docker.iot-soleng-stg.gcp.devopsacc.team:80
+    registry: platform-us.staging.gcp.devopsacc.team/mrs-docker
     image: frontapp-js
     repoSource: mrs-docker
     repoPromotion1: mrs-docker-rc-local

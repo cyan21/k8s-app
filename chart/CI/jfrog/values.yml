@@ -2,7 +2,7 @@ Init:
   pipelineName: k8s_project_init
   container:
     # for Docker build
-    registry: iot-soleng-stg.gcp.devopsacc.team:80/stn-docker
+    registry: platform-us.staging.gcp.devopsacc.team/stn-docker
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
     # repoSource and repoPromotion have to be local repo (due to the JFrog CLI limitation)
