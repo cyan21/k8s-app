@@ -97,14 +97,14 @@ pipelines:
         type: NpmBuild
         configuration:
           # npmArgs: {{ .Values.FrontAppJSSteps.npmBuild.args }}
-          runtime:
-            type: image
-            image:
-              custom:
-                registry: {{ .Values.FrontApp.artifactoryIntegration }}
-                name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
-                tag: 12.18.2-ych
-                sourceRepository: mrs-docker
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
+          #       name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
+          #       tag: 12.18.2-ych
+          #       sourceRepository: mrs-docker
           affinityGroup: together
           repositoryName: {{ .Values.FrontApp.js.repoNpmSource }}
           sourceLocation: {{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}
@@ -134,6 +134,14 @@ pipelines:
         type: Bash
         configuration:
           affinityGroup: together
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
+          #       name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
+          #       tag: 12.18.2-ych
+          #       sourceRepository: mrs-docker
           environmentVariables:
             OFFLINE_MODE: "true"
           inputSteps:
@@ -158,10 +166,15 @@ pipelines:
           onSuccess:
             - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
             - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
-            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
-            - jfrog rt bce {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
-            - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
-            - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+            # - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
+            # - jfrog rt bce {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
+            # - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
+            # - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name=${pipeline_name} --build-number=${run_number}
+            - jfrog rt bce ${pipeline_name}  ${run_number}
+            - jfrog rt bp ${pipeline_name}  ${run_number}
+            - jfrog rt sp --build=${pipeline_name} /${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+
 
       - name: {{ .Values.FrontAppJSSteps.xray.name }}
         type: XrayScan
