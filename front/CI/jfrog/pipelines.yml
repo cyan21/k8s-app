@@ -129,7 +129,6 @@ pipelines:
             - add_run_files  /tmp/jfrog  jfrogCLI_tmp
             - apt install tree -y
             - tree /tmp/jfrog
-            - exit 1
 
       - name: {{ .Values.FrontAppJSSteps.packageAndPublish.name }}
         type: Bash
@@ -146,9 +145,10 @@ pipelines:
         execution:
           onStart:
             - restore_run_files mySources .
-            - mkdir /tmp/jfrog 
-            - restore_run_files jfrogCLI_tmp /tmp/jfrog/
-            - ls -l /tmp/jfrog/
+#            - mkdir /tmp/jfrog 
+            - restore_run_files jfrog /tmp/jfrog/
+#            - restore_run_files jfrogCLI_tmp /tmp/jfrog/
+#            - ls -l /tmp/jfrog/
             - npm run build
             - apt install tree -y
             - tree /tmp/jfrog/
