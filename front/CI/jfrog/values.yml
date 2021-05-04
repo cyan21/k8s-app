@@ -112,16 +112,16 @@ FrontAppContainerDeployResources:
       include: '^chart\/.+'
   helmChart:
     resourceName: hc_my_app_frontapp_js
-    repo: saturn-helm
+    repo: stn-helm
     name: myapp
     version: 1.0.0
     
 FrontAppContainerDeploySteps:
   helmDeploy:
     name: deploy_helm_chart
-    container: # workaround to make Helm V3 to work
-      image: jfrog/pipelines-u18node
-      tag: 10.21.0-jfrog
+    # container: # workaround to make Helm V3 to work
+    #   image: jfrog/pipelines-u18node
+    #   tag: 10.21.0-jfrog
   testing:
     name: run_app_test
   promotion:
