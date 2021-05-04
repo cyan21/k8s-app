@@ -7,12 +7,12 @@ email="yannc@jfrog.com"
 backend_registry_name="backend-registry-jupiter"
 backend_registry_url="platform-us.staging.gcp.devopsacc.team"
 backend_registry_user="yannc@jfrog.com"
-backend_registry_pass="AKCp8ii9EF5t1uxMamxLx6VgCfZaLbRjzZpLMuf1xGMy2A5goYu74drkZZavEAgvmZaSfaimv"
+backend_registry_pass="%%%%%%%%%%%%"
 
 frontend_registry_name="front-registry-mars"
 frontend_registry_url="platform-us.staging.gcp.devopsacc.team"
 frontend_registry_user="yannc@jfrog.com"
-frontend_registry_pass="AKCp8ii9EF5t1uxMamxLx6VgCfZaLbRjzZpLMuf1xGMy2A5goYu74drkZZavEAgvmZaSfaimv"
+frontend_registry_pass="%%%%%%%%%%%"
 
 # create namespace, service account, role, role binding
 sed "s/MY_NAMESPACE/$ns/g" demo.yaml.tpl > demo.yaml
