@@ -222,11 +222,6 @@ pipelines:
             - name: {{ .Values.BackAppGradleResources.propertyBag.name }}
         execution:
           onExecute:
-            # - sudo mkdir -p /etc/docker 
-            # - > 
-            #   sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackApp.container.registry }}\"]}" > /etc/docker/daemon.json
-            # - sudo systemctl restart docker
-            # - sudo cat /etc/docker/daemon.json
             - add_run_variables runVarAppVersion=${res_{{ .Values.BackAppGradleResources.propertyBag.name }}_appVersion}
             - add_run_variables runVarAppCommitSHA=${res_{{ .Values.BackAppGradleResources.propertyBag.name }}_appCommitSHA}
 
@@ -320,12 +315,6 @@ pipelines:
             - name: {{ .Values.BackAppContainerResources.propertyBag.name }}
         execution:
           onExecute:
-            # - sudo mkdir -p /etc/docker 
-            # - > 
-            #   sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.BackApp.container.registry }}\"]}" > /etc/docker/daemon.json
-            # - sudo systemctl restart docker
-            # - sudo cat /etc/docker/daemon.json
-            # - sudo systemctl status docker
             - echo ${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_newTag}
             - add_run_variables runVarNewTag=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_newTag}
             - add_run_variables runVarBuildName=${res_{{ .Values.BackAppContainerResources.propertyBag.name }}_buildInfoName}
