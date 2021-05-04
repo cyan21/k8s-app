@@ -1,47 +1,47 @@
 localRepositories:   
-  mars-npm-dev-local:
+  mrs-npm-dev-local:
     type: npm
     repoLayout: npm-default 
     xray:   
       enabled: true
-  mars-npm-rc-local:
+  mrs-npm-rc-local:
     type: npm
     repoLayout: npm-default 
     xray:   
       enabled: true
-  mars-generic-dev-local:
+  mrs-generic-dev-local:
     type: generic
     repoLayout: simple-default 
     xray:   
       enabled: true
-  mars-generic-rc-local:
+  mrs-generic-rc-local:
     type: generic
     repoLayout: simple-default 
     xray:   
       enabled: true
-  mars-docker-dev-local:
+  mrs-docker-dev-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
-  mars-docker-rc-local:
+  mrs-docker-rc-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
-  mars-docker-release-local:
+  mrs-docker-release-local:
     type: docker
     repoLayout: simple-default 
     xray:   
       enabled: true
 remoteRepositories: 
-  mars-npmjs-remote:
+  mrs-npmjs-remote:
     type: npm
     repoLayout: npm-default 
     url: https://registry.npmjs.org
     xray:   
       enabled: true
-  mars-dockerhub-remote:
+  mrs-dockerhub-remote:
     type: docker 
     url: https://registry-1.docker.io/
     dockerApiVersion: V2
@@ -49,7 +49,7 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  mars-bintray-remote:
+  mrs-bintray-remote:
     type: docker
     url: https://docker.bintray.io/
     dockerApiVersion: V2
@@ -58,30 +58,30 @@ remoteRepositories:
     xray:   
       enabled: true
 virtualRepositories: 
-  mars-npm:
+  mrs-npm:
     type: npm
     repoLayout: npm-default 
     repositories:   
-      - mars-npm-dev-local
-      - mars-npm-rc-local
-      - mars-npmjs-remote
-    defaultDeploymentRepo: mars-npm-dev-local
-  mars-generic:
+      - mrs-npm-dev-local
+      - mrs-npm-rc-local
+      - mrs-npmjs-remote
+    defaultDeploymentRepo: mrs-npm-dev-local
+  mrs-generic:
     type: generic
     repoLayout: simple-default 
     repositories:   
-      - mars-generic-dev-local
-      - mars-generic-rc-local
-    defaultDeploymentRepo: mars-generic-dev-local
-  mars-docker:
+      - mrs-generic-dev-local
+      - mrs-generic-rc-local
+    defaultDeploymentRepo: mrs-generic-dev-local
+  mrs-docker:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - mars-docker-dev-local
-      - mars-docker-rc-local
-      - mars-docker-release-local
-      - mars-dockerhub-remote
-      - mars-bintray-remote
-      - saturn-docker-release-local
-    defaultDeploymentRepo: mars-docker-dev-local
+      - mrs-docker-dev-local
+      - mrs-docker-rc-local
+      - mrs-docker-release-local
+      - mrs-dockerhub-remote
+      - mrs-bintray-remote
+      - stn-docker-release-local
+    defaultDeploymentRepo: mrs-docker-dev-local

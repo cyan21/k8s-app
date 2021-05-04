@@ -1,22 +1,22 @@
 localRepositories:   
-  saturn-docker-release-local:
+  stn-docker-release-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  saturn-helm-dev-local:
+  stn-helm-dev-local:
     type: helm
     repoLayout: simple-default 
     xray:   
       enabled: false
-  saturn-helm-release-local:
+  stn-helm-release-local:
     type: helm
     repoLayout: simple-default 
     xray:   
       enabled: false
 remoteRepositories: 
-  saturn-dockerhub-remote:
+  stn-dockerhub-remote:
     type: docker 
     url: https://registry-1.docker.io/
     dockerApiVersion: V2
@@ -24,7 +24,7 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  saturn-bintray-remote:
+  stn-bintray-remote:
     type: docker
     url: https://docker.bintray.io/
     dockerApiVersion: V2
@@ -32,27 +32,27 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  saturn-chartcenter-remote:
+  stn-chartcenter-remote:
     type: helm
     url: https://repo.chartcenter.io/
     repoLayout: simple-default 
     xray:   
       enabled: false
 virtualRepositories: 
-  saturn-docker:
+  stn-docker:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - saturn-docker-release-local
-      - saturn-dockerhub-remote
-      - saturn-bintray-remote
-    defaultDeploymentRepo: saturn-docker-release-local
-  saturn-helm:
+      - stn-docker-release-local
+      - stn-dockerhub-remote
+      - stn-bintray-remote
+    defaultDeploymentRepo: stn-docker-release-local
+  stn-helm:
     type: helm
     repoLayout: simple-default 
     repositories:   
-      - saturn-helm-dev-local
-      - saturn-helm-release-local
-      - saturn-chartcenter-remote
-    defaultDeploymentRepo: saturn-helm-dev-local
+      - stn-helm-dev-local
+      - stn-helm-release-local
+      - stn-chartcenter-remote
+    defaultDeploymentRepo: stn-helm-dev-local

@@ -1,32 +1,32 @@
 localRepositories:   
-  jupiter-grdl-dev-local:
+  jpt-grdl-dev-local:
     type: gradle
     repoLayout: maven-2-default 
     xray:   
       enabled: true
-  jupiter-grdl-rc-local:
+  jpt-grdl-rc-local:
     type: gradle
     repoLayout: maven-2-default 
     xray:   
       enabled: true
-  jupiter-grdl-release-local:
+  jpt-grdl-release-local:
     type: gradle
     repoLayout: maven-2-default 
     xray:   
       enabled: true
-  jupiter-docker-dev-local:
+  jpt-docker-dev-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  jupiter-docker-rc-local:
+  jpt-docker-rc-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     xray:   
       enabled: true
-  jupiter-docker-release-local:
+  jpt-docker-release-local:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
@@ -44,13 +44,13 @@ localRepositories:
   #   xray:   
   #     enabled: true
 remoteRepositories: 
-  jupiter-jcenter-grdl-remote:
+  jpt-jcenter-grdl-remote:
     type: gradle 
     repoLayout: maven-2-default 
     url: https://jcenter.bintray.com 
     xray:   
       enabled: true
-  jupiter-dockerhub-remote:
+  jpt-dockerhub-remote:
     type: docker 
     url: https://registry-1.docker.io/
     dockerApiVersion: V2
@@ -58,7 +58,7 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  jupiter-bintray-remote:
+  jpt-bintray-remote:
     type: docker
     url: https://docker.bintray.io/
     dockerApiVersion: V2
@@ -66,31 +66,31 @@ remoteRepositories:
     enableTokenAuthentication: true
     xray:   
       enabled: true
-  saturn-chartcenter-remote:
+  stn-chartcenter-remote:
     type: helm
     url: https://repo.chartcenter.io/
     repoLayout: simple-default 
     xray:   
       enabled: false
 virtualRepositories: 
-  jupiter-docker:
+  jpt-docker:
     type: docker
     dockerApiVersion: V2
     repoLayout: simple-default 
     repositories:   
-      - jupiter-docker-dev-local
-      - jupiter-docker-rc-local
-      - jupiter-docker-release-local
-      - jupiter-dockerhub-remote
-      - jupiter-bintray-remote
-      - saturn-docker-release-local
-    defaultDeploymentRepo: jupiter-docker-dev-local
-  jupiter-grdl:
+      - jpt-docker-dev-local
+      - jpt-docker-rc-local
+      - jpt-docker-release-local
+      - jpt-dockerhub-remote
+      - jpt-bintray-remote
+      - stn-docker-release-local
+    defaultDeploymentRepo: jpt-docker-dev-local
+  jpt-grdl:
     type: gradle
     repoLayout: maven-2-default 
     repositories:   
-      - jupiter-grdl-dev-local
-      - jupiter-grdl-rc-local
-      - jupiter-grdl-release-local
-      - jupiter-jcenter-grdl-remote
-    defaultDeploymentRepo: jupiter-grdl-dev-local
+      - jpt-grdl-dev-local
+      - jpt-grdl-rc-local
+      - jpt-grdl-release-local
+      - jpt-jcenter-grdl-remote
+    defaultDeploymentRepo: jpt-grdl-dev-local
