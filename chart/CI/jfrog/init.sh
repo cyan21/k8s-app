@@ -8,7 +8,7 @@ usage() {
 }
 
 JPD_URL="https://platform-us.staging.gcp.devopsacc.team"
-ADMIN_USER="admin"
+ADMIN_USER="toto"
 BUILD_NAMES="k8s_backapp_gradle,k8s_backapp_gradle_docker,k8s_frontapp_js,k8s_frontapp_js_docker"  #list with comma as a separator
 
 while getopts "u:l:p:" option; do

@@ -196,7 +196,7 @@ pipelines:
 #            - git checkout ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
             - git checkout demo
             - git branch
-            - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url%/artifactory} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey}
+            - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url%/artifactory} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey} -l ${int_{{ .Values.Init.artifactoryIntegration }}_user}
       
       - name: {{ .Values.InitSteps.publishHelm.name }}
         type: HelmPublish
