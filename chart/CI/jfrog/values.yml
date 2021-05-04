@@ -70,12 +70,12 @@ Chart:
   pipelineName: k8s_bump_helm_chart
   # It's either Chart + Docker OR Docker distribution (see back/CI/jfrog/pipelines/values/yml  > BackApp.distribute)
   distribute: true
-  # TO DO  : REMOVE THE CUSTOM IMAGE IN THE LATEST VERSION OF PIPELINE
-  container:
-    registry: iot-soleng-stg.gcp.devopsacc.team:80/stn-docker
-    image: jfrog/pipelines-u18node
-    tag: 10.21.0-jfrog
-    repoSource: stn-docker-release-local
+  # # TO DO  : REMOVE THE CUSTOM IMAGE IN THE LATEST VERSION OF PIPELINE
+  # container:
+  #   registry: iot-soleng-stg.gcp.devopsacc.team:80/stn-docker
+  #   image: jfrog/pipelines-u18node
+  #   tag: 10.21.0-jfrog
+  #   repoSource: stn-docker-release-local
   # used by the Helm Chart resource
   repo: stn-helm
   repoPromotion1: stn-helm-release-local

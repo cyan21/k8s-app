@@ -222,34 +222,34 @@ pipelines:
         #     - helm3 version
         #     - cat ${res_{{ .Values.InitResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
 
-      - name: {{ .Values.InitSteps.dockerBuild.name }}
-        type: DockerBuild
-        configuration:
-          affinityGroup: helm
-          dockerFileName: {{ .Values.InitSteps.dockerBuild.dockerFileName }}
-          dockerFileLocation: {{ .Values.InitSteps.dockerBuild.dockerFileLocation }}
-          dockerImageName: "{{ .Values.Init.container.registry }}/{{ .Values.Init.container.image }}"
-          dockerImageTag: {{ .Values.Init.container.tag }}
-          inputSteps:
-            - name: {{ .Values.InitSteps.publishHelm.name }}
-          inputResources:
-            - name: {{ .Values.InitResources.gitRepoDocker.name }}
-          integrations:
-            - name: {{ .Values.Init.artifactoryIntegration }}
+      # - name: {{ .Values.InitSteps.dockerBuild.name }}
+      #   type: DockerBuild
+      #   configuration:
+      #     affinityGroup: helm
+      #     dockerFileName: {{ .Values.InitSteps.dockerBuild.dockerFileName }}
+      #     dockerFileLocation: {{ .Values.InitSteps.dockerBuild.dockerFileLocation }}
+      #     dockerImageName: "{{ .Values.Init.container.registry }}/{{ .Values.Init.container.image }}"
+      #     dockerImageTag: {{ .Values.Init.container.tag }}
+      #     inputSteps:
+      #       - name: {{ .Values.InitSteps.publishHelm.name }}
+      #     inputResources:
+      #       - name: {{ .Values.InitResources.gitRepoDocker.name }}
+      #     integrations:
+      #       - name: {{ .Values.Init.artifactoryIntegration }}
 
-      - name: {{ .Values.InitSteps.dockerPush.name }}
-        type: DockerPush
-        configuration:
-          affinityGroup: helm
-          targetRepository: {{ .Values.Init.container.repoSource }}
-          autoPublishBuildInfo:  {{ .Values.InitSteps.dockerPush.autoPublishBuildInfo }}
-          forceXrayScan:  {{ .Values.InitSteps.dockerPush.forceXrayScan }}
-          inputSteps:
-            - name: {{ .Values.InitSteps.dockerBuild.name }}
-          integrations:
-            - name: {{ .Values.Init.artifactoryIntegration }}
-          outputResources:
-            - name: {{ .Values.InitResources.buildInfoHelm.resourceName }}
+      # - name: {{ .Values.InitSteps.dockerPush.name }}
+      #   type: DockerPush
+      #   configuration:
+      #     affinityGroup: helm
+      #     targetRepository: {{ .Values.Init.container.repoSource }}
+      #     autoPublishBuildInfo:  {{ .Values.InitSteps.dockerPush.autoPublishBuildInfo }}
+      #     forceXrayScan:  {{ .Values.InitSteps.dockerPush.forceXrayScan }}
+      #     inputSteps:
+      #       - name: {{ .Values.InitSteps.dockerBuild.name }}
+      #     integrations:
+      #       - name: {{ .Values.Init.artifactoryIntegration }}
+      #     outputResources:
+      #       - name: {{ .Values.InitResources.buildInfoHelm.resourceName }}
 
 ## HELM PIPELINE
   - name: {{ .Values.Chart.pipelineName }}
