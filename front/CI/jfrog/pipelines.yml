@@ -97,6 +97,14 @@ pipelines:
         type: NpmBuild
         configuration:
           # npmArgs: {{ .Values.FrontAppJSSteps.npmBuild.args }}
+          runtime:
+            type: image
+            image:
+              custom:
+                registry: {{ .Values.FrontApp.artifactoryIntegration }}
+                name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
+                tag: 12.18.2-ych
+                sourceRepository: mrs-docker
           affinityGroup: together
           repositoryName: {{ .Values.FrontApp.js.repoNpmSource }}
           sourceLocation: {{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}
@@ -109,6 +117,7 @@ pipelines:
             # retrieved cached dependencies (stored onSucess execution)            
 #            - restore_cache_files npm_cache ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/node_modules
           onSuccess:
+            - jfrog --version
             - add_run_variables runVarAppVersion=`jq -r ".version" ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/package.json`
             - echo $runVarAppVersion
             - add_run_variables runVarGitCommit=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_commitSha}
@@ -120,6 +129,7 @@ pipelines:
             - add_run_files  /tmp/jfrog  jfrogCLI_tmp
             - apt install tree -y
             - tree /tmp/jfrog
+            - exit 1
 
       - name: {{ .Values.FrontAppJSSteps.packageAndPublish.name }}
         type: Bash
