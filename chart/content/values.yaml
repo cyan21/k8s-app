@@ -1,8 +1,8 @@
 replicaCount: 1
 
 imagePullSecrets:
-  - name: avengers-registry
-  - name: kaizoku-registry
+  - name: backend-registry-jupiter
+  - name: frontend-registry-mars
 
 nameOverride: ""
 fullnameOverride: ""
