@@ -329,14 +329,14 @@ pipelines:
             JFROG_CLI_LOG_LEVEL: DEBUG
           affinityGroup: deploy
           helmVersion: 3
-          runtime:
-            type: image
-            image:
-              custom:
-                registry: {{ .Values.BackApp.artifactoryIntegration }}
-                name: "{{ .Values.BackApp.container.registry }}/{{ .Values.BackAppContainerDeploySteps.helmDeploy.container.image }}"
-                tag: {{ .Values.BackAppContainerDeploySteps.helmDeploy.container.tag }}
-                sourceRepository: {{ .Values.BackApp.container.repoSource }}
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.BackApp.artifactoryIntegration }}
+          #       name: "{{ .Values.BackApp.container.registry }}/{{ .Values.BackAppContainerDeploySteps.helmDeploy.container.image }}"
+          #       tag: {{ .Values.BackAppContainerDeploySteps.helmDeploy.container.tag }}
+          #       sourceRepository: {{ .Values.BackApp.container.repoSource }}
           inputSteps:
             - name: setup_env
           integrations:

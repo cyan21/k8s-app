@@ -295,14 +295,14 @@ pipelines:
         configuration:
           affinityGroup: deploy
           helmVersion: 3
-          runtime:
-            type: image
-            image:
-              custom:
-                registry: {{ .Values.FrontApp.artifactoryIntegration }}
-                name: "{{ .Values.FrontApp.container.registry }}/{{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.image }}"
-                tag: {{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.tag }}
-                sourceRepository: {{ .Values.FrontApp.container.repoSource }}
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
+          #       name: "{{ .Values.FrontApp.container.registry }}/{{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.image }}"
+          #       tag: {{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.tag }}
+          #       sourceRepository: {{ .Values.FrontApp.container.repoSource }}
           inputSteps:
             - name: setup_env
           integrations:
