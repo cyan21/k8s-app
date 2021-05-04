@@ -334,15 +334,15 @@ pipelines:
           environmentVariables:
             JFROG_CLI_LOG_LEVEL: DEBUG
           helmVersion: 3
-          # WORKAROUND TO MAKE HELM 3 WORK : SHOULD BE REMOVED IN THE LATEST VERSIONS
-          runtime:
-            type: image
-            image:
-              custom:
-                registry: {{ .Values.Chart.artifactoryIntegration }}
-                name: "{{ .Values.Chart.container.registry }}/{{ .Values.Chart.container.image }}"
-                tag: {{ .Values.Chart.container.tag }}
-                sourceRepository: {{ .Values.Chart.container.repoSource }}
+          # # WORKAROUND TO MAKE HELM 3 WORK : SHOULD BE REMOVED IN THE LATEST VERSIONS
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.Chart.artifactoryIntegration }}
+          #       name: "{{ .Values.Chart.container.registry }}/{{ .Values.Chart.container.image }}"
+          #       tag: {{ .Values.Chart.container.tag }}
+          #       sourceRepository: {{ .Values.Chart.container.repoSource }}
           integrations:
             - name: {{ .Values.Chart.k8sIntegration }}
           inputResources:
