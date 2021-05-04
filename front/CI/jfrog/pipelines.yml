@@ -118,6 +118,8 @@ pipelines:
             - add_run_files  ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }} mySources            
             # pass JFrog CLI tmp folder to next step
             - add_run_files  /tmp/jfrog  jfrogCLI_tmp
+            - apt install tree -y
+            - tree /tmp/jfrog
 
       - name: {{ .Values.FrontAppJSSteps.packageAndPublish.name }}
         type: Bash
@@ -138,6 +140,7 @@ pipelines:
             - restore_run_files jfrogCLI_tmp /tmp/jfrog/
             - ls -l /tmp/jfrog/
             - npm run build
+            - tree /tmp/jfrog/
           onExecute:
             - echo "Run Unit Testing ..." 
             - if [ $OFFLINE_MODE == "true" ]; then echo "Offline mode turned on";fi
