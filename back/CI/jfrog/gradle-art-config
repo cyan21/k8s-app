@@ -1,0 +1,10 @@
+version: 1
+type: gradle
+useWrapper: false
+resolver:
+  repo: GRADLE_REPO
+  serverID: ARTIFACTORY_ID
+deployer:
+  repo: GRADLE_REPO
+  serverID: ARTIFACTORY_ID
+  deployMavenDescriptors: false
