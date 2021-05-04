@@ -5,8 +5,8 @@ FrontApp:
   projectName: mars
   appName: frontapp
   artifactoryIntegration: artifactory_eu
-  k8sIntegration: build_k8s
-  k8sNamespace: mars
+  k8sIntegration: yann_k8s
+  k8sNamespace: build-plane
   js:
     repoNpmSource: mrs-npm
     repoSource: mrs-generic

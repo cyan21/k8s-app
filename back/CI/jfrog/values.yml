@@ -3,12 +3,12 @@ BackApp:
   pipelineContainerName: k8s_backapp_gradle_docker
   pipelineDeployName: k8s_backapp_gradle_deployment
   pipelineDistributionName: k8s_backapp_gradle_distribute
-  distribute: true
+  distribute: false
   releaseBundleName: iot-soleng-stg
   projectName: jpt
   artifactoryIntegration: artifactory_eu
-  k8sIntegration: build_k8s
-  k8sNamespace: saturn
+  k8sIntegration: yann_k8s
+  k8sNamespace: build-plane
   gradle:
     repoSource: jpt-grdl
     repoPromotion1: jpt-grdl-release-local
