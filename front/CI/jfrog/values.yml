@@ -6,17 +6,17 @@ FrontApp:
   appName: frontapp
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
-  k8sNamespace: saturn
+  k8sNamespace: mars
   js:
-    repoNpmSource: mars-npm
-    repoSource: mars-generic
-    repoPromotion1: mars-generic-rc-local
+    repoNpmSource: mrs-npm
+    repoSource: mrs-generic
+    repoPromotion1: mrs-generic-rc-local
   container:
-    registry: mars-docker.ot-demo.gcp.devopsacc.team:80
+    registry: mrs-docker.iot-soleng-stg.gcp.devopsacc.team:80
     image: frontapp-js
-    repoSource: mars-docker
-    repoPromotion1: mars-docker-rc-local
-    repoPromotion2: mars-docker-release-local
+    repoSource: mrs-docker
+    repoPromotion1: mrs-docker-rc-local
+    repoPromotion2: mrs-docker-release-local
 
 ##########################################
 ## NPM Pipeline
@@ -28,7 +28,7 @@ FrontAppNpmResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       exclude: '^front\/CI\/.+'
       include: '^front\/.+'
@@ -66,7 +66,7 @@ FrontAppContainerResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: '^front\/CI\/Docker\/.+'
   fileSpec:
@@ -107,7 +107,7 @@ FrontAppContainerDeployResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: '^chart\/.+'
   helmChart:
