@@ -7,7 +7,7 @@ BackApp:
   releaseBundleName: iot-soleng-stg
   projectName: jpt
   artifactoryIntegration: artifactory_eu
-  k8sIntegration: yann_k8s
+  k8sIntegration: build_k8s
   k8sNamespace: saturn
   gradle:
     repoSource: jpt-grdl
