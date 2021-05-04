@@ -140,6 +140,7 @@ pipelines:
             - restore_run_files jfrogCLI_tmp /tmp/jfrog/
             - ls -l /tmp/jfrog/
             - npm run build
+            - apt install tree -y
             - tree /tmp/jfrog/
           onExecute:
             - echo "Run Unit Testing ..." 
