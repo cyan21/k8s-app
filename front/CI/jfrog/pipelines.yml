@@ -177,9 +177,10 @@ pipelines:
             # - apt install tree -y
             # - tree /tmp/jfrog/
             - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
+            - jfrog rt bp   
             - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
             - jfrog rt bce   
-            - jfrog rt bp   
+            # - jfrog rt bp   
           onExecute:
             - echo "Run Unit Testing ..." 
             - if [ $OFFLINE_MODE == "true" ]; then echo "Offline mode turned on";fi
