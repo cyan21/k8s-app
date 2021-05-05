@@ -105,6 +105,12 @@ pipelines:
                 name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
                 tag: 12.18.2-ych
                 sourceRepository: mrs-docker
+          environmentVariables:
+            OFFLINE_MODE: "true"
+            JFROG_CLI_BUILD_URL: "${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
+            JFROG_CLI_BUILD_NAME: "${pipeline_name}"
+            JFROG_CLI_BUILD_NUMBER: "${run_number}"
+            JFROG_CLI_TEMP_DIR: "/tmp" 
           affinityGroup: together
           repositoryName: {{ .Values.FrontApp.js.repoNpmSource }}
           sourceLocation: {{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}
@@ -145,6 +151,10 @@ pipelines:
                 sourceRepository: mrs-docker
           environmentVariables:
             OFFLINE_MODE: "true"
+            JFROG_CLI_BUILD_URL: "${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
+            JFROG_CLI_BUILD_NAME: "${pipeline_name}"
+            JFROG_CLI_BUILD_NUMBER: "${run_number}"
+            JFROG_CLI_TEMP_DIR: "/tmp" 
           inputSteps:
             - name: {{ .Values.FrontAppJSSteps.npmBuild.name }}
           integrations:
@@ -153,9 +163,6 @@ pipelines:
             - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
         execution:
           onStart:
-            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
-            - export JFROG_CLI_BUILD_NAME="${pipeline_name}"
-            - export JFROG_CLI_BUILD_NUMBER="${run_number}" 
             - restore_run_files npmBuildInputGitRepo .
             - ls -l 
             - cd front/
