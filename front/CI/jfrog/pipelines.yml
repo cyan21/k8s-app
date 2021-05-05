@@ -97,14 +97,14 @@ pipelines:
         type: NpmBuild
         configuration:
           # npmArgs: {{ .Values.FrontAppJSSteps.npmBuild.args }}
-          # runtime:
-          #   type: image
-          #   image:
-          #     custom:
-          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
-          #       name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
-          #       tag: 12.18.2-ych
-          #       sourceRepository: mrs-docker
+          runtime:
+            type: image
+            image:
+              custom:
+                registry: {{ .Values.FrontApp.artifactoryIntegration }}
+                name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
+                tag: 12.18.2-ych
+                sourceRepository: mrs-docker
           affinityGroup: together
           repositoryName: {{ .Values.FrontApp.js.repoNpmSource }}
           sourceLocation: {{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}
@@ -135,14 +135,14 @@ pipelines:
         type: Bash
         configuration:
           affinityGroup: together
-          # runtime:
-          #   type: image
-          #   image:
-          #     custom:
-          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
-          #       name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
-          #       tag: 12.18.2-ych
-          #       sourceRepository: mrs-docker
+          runtime:
+            type: image
+            image:
+              custom:
+                registry: {{ .Values.FrontApp.artifactoryIntegration }}
+                name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
+                tag: 12.18.2-ych
+                sourceRepository: mrs-docker
           environmentVariables:
             OFFLINE_MODE: "true"
           inputSteps:
