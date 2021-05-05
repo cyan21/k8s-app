@@ -153,37 +153,40 @@ pipelines:
             - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
         execution:
           onStart:
+            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
+            - export JFROG_CLI_BUILD_NAME="${pipeline_name}"
+            - export JFROG_CLI_BUILD_NUMBER="${run_number}" 
             - restore_run_files npmBuildInputGitRepo .
             - ls -l 
+            - cd front/
             - restore_run_files jfrog /tmp/jfrog
             - ls -l /tmp/jfrog/
-            - restore_run_files mySources .
+            # - restore_run_files mySources .
             - ls -l 
 #            - mkdir /tmp/jfrog 
 #            - restore_run_files jfrogCLI_tmp /tmp/jfrog/
 #            - ls -l /tmp/jfrog/
             - npm run build
-            - apt install tree -y
-            - tree /tmp/jfrog/
+            # - apt install tree -y
+            # - tree /tmp/jfrog/
+            - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
+            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
+            - jfrog rt bce   
+            - jfrog rt bp   
           onExecute:
             - echo "Run Unit Testing ..." 
             - if [ $OFFLINE_MODE == "true" ]; then echo "Offline mode turned on";fi
-          onSuccess:
-            - tree /tmp/jfrog/
-            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
-            - export JFROG_CLI_BUILD_NAME=${pipeline_name}
-            - export JFROG_CLI_BUILD_NUMBER=${run_number} 
-            - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
-            # - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
-            # - jfrog rt bce {{ .Values.FrontAppNpmResources.buildInfo.name }}-publish ${run_number}
-            # - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }}-publish ${run_number}
-            # - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}-publish/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
-            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
-            #--build-name=${pipeline_name} --build-number=${run_number}
-            - jfrog rt bce   
-            - jfrog rt bp   
+          # onSuccess:
+          #   - tree /tmp/jfrog/
+          #   - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
+          #   # - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
+          #   # - jfrog rt bce {{ .Values.FrontAppNpmResources.buildInfo.name }}-publish ${run_number}
+          #   # - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }}-publish ${run_number}
+          #   # - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}-publish/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+          #   - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
+          #   - jfrog rt bce   
+          #   - jfrog rt bp   
             - jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
-            - exit 1
 
       - name: {{ .Values.FrontAppJSSteps.xray.name }}
         type: XrayScan
