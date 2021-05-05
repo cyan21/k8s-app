@@ -163,6 +163,7 @@ pipelines:
             - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
         execution:
           onStart:
+            - env | grep JFROG_CLI
             - restore_run_files npmBuildInputGitRepo .
             - ls -l 
             - cd front/
@@ -182,6 +183,7 @@ pipelines:
             - jfrog rt bce   
             # - jfrog rt bp   
           onExecute:
+            - env | grep JFROG_CLI
             - echo "Run Unit Testing ..." 
             - if [ $OFFLINE_MODE == "true" ]; then echo "Offline mode turned on";fi
           # onSuccess:
