@@ -124,7 +124,7 @@ pipelines:
             # cache node_modules folder for future runs
 #            - add_cache_files ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/node_modules npm_cache
             # pass front folder to next step
-#            - add_run_files  ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }} mySources            
+            - add_run_files  ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }} mySources            
             # pass JFrog CLI tmp folder to next step
 #            - add_run_files  /tmp/jfrog  jfrogCLI_tmp
             - apt install tree -y
@@ -154,8 +154,11 @@ pipelines:
         execution:
           onStart:
             - restore_run_files npmBuildInputGitRepo .
+            - ls -l 
             - restore_run_files jfrog /tmp/jfrog
-#            - restore_run_files mySources .
+            - ls -l /tmp/jfrog/
+            - restore_run_files mySources .
+            - ls -l 
 #            - mkdir /tmp/jfrog 
 #            - restore_run_files jfrogCLI_tmp /tmp/jfrog/
 #            - ls -l /tmp/jfrog/
