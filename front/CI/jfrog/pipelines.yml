@@ -181,8 +181,8 @@ pipelines:
             # - tree /tmp/jfrog/
             - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
             - /var/opt/jfrog/pipelines/jfrog/jfrog rt bp   
-            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
-            - jfrog rt bce   
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt bce   
             # - jfrog rt bp   
           onExecute:
             - env | grep JFROG_CLI
