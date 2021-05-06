@@ -164,6 +164,8 @@ pipelines:
         execution:
           onStart:
             - env | grep JFROG_CLI
+            - /var/opt/jfrog/pipelines/jfrog/jfrog --version
+            - jfrog --version
             - restore_run_files npmBuildInputGitRepo .
             - ls -l 
             - cd front/
@@ -178,7 +180,7 @@ pipelines:
             # - apt install tree -y
             # - tree /tmp/jfrog/
             - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
-            - jfrog rt bp   
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt bp   
             - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
             - jfrog rt bce   
             # - jfrog rt bp   
