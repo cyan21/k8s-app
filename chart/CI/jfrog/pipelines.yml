@@ -285,6 +285,8 @@ pipelines:
             # for FileSpec resources
             - add_run_variables runVarFrontManifest=${front_repo_path}/$front_img_name}/${front_vers}/manifest.json
             - add_run_variables runVarBackManifest=${back_repo_path}/${back_img_name}/${back_vers}/manifest.json
+            - echo $runVarFrontManifest
+            - echo $runVarBackManifest
             # for adding properties on the Helm Chart
             - add_run_variables runVarFrontImage=${front_img_name}/${front_vers}
             - add_run_variables runVarBackImage=${back_img_name}/${back_vers}
@@ -312,8 +314,8 @@ pipelines:
             - name: {{ .Values.ChartResources.buildInfo.resourceName }}
         execution:
           onStart:
-            # - echo ${runVarFrontManifest}
-            # - echo ${runVarBackManifest}
+            - echo ${runVarFrontManifest}
+            - echo ${runVarBackManifest}
             # - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
             # - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
             # - helm3 version
