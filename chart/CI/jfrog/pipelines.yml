@@ -283,7 +283,7 @@ pipelines:
             - back_img_name=`yq eval '.images.back.repository' values.yaml  |  sed "s/.*.*\/\(.*\)/\1/g"` && echo $back_img_name
             - back_vers=`yq eval '.images.back.tag' values.yaml` && echo $back_vers
             # for FileSpec resources
-            - add_run_variables runVarFrontManifest=${front_repo_path}/$front_img_name}/${front_vers}/manifest.json
+            - add_run_variables runVarFrontManifest=${front_repo_path}/${front_img_name}/${front_vers}/manifest.json
             - add_run_variables runVarBackManifest=${back_repo_path}/${back_img_name}/${back_vers}/manifest.json
             - echo $runVarFrontManifest
             - echo $runVarBackManifest
