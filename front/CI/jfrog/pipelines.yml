@@ -186,7 +186,7 @@ pipelines:
             - /var/opt/jfrog/pipelines/jfrog/jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
             - /var/opt/jfrog/pipelines/jfrog/jfrog rt bce   
             - /var/opt/jfrog/pipelines/jfrog/jfrog rt bp   
-            - jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
 
       - name: {{ .Values.FrontAppJSSteps.xray.name }}
         type: XrayScan
@@ -278,7 +278,7 @@ pipelines:
             - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppContainerResources.buildInfo.name }}/${run_number}/setup_env?branch=${runBranchName}"
           onSuccess:
             - echo "{{ .Values.FrontApp.container.repoSource }}/${envVarAppName}/${runVarAppVersion}/manifest.json"
-            - jfrog rt sp --build=${res_{{ .Values.FrontAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.FrontApp.container.repoSource }}/{{ .Values.FrontApp.container.image }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp --build=${res_{{ .Values.FrontAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.FrontApp.container.repoSource }}/{{ .Values.FrontApp.container.image }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
 
       - name: {{ .Values.FrontAppContainerSteps.xray.name }}
         type: XrayScan
@@ -391,7 +391,7 @@ pipelines:
             - cat payload.json
             # escape semi colon
             - > 
-              jfrog rt curl -XPOST api/docker/{{ .Values.FrontApp.container.repoPromotion1 }}/v2/promote -H "Content-Type: application/json" -d @payload.json
+              /var/opt/jfrog/pipelines/jfrog/jfrog rt curl -XPOST api/docker/{{ .Values.FrontApp.container.repoPromotion1 }}/v2/promote -H "Content-Type: application/json" -d @payload.json
           onSuccess:
             - echo  "jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json \"validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}\""
-            - jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
