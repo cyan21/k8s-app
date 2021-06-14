@@ -144,7 +144,7 @@ pipeline {
                             buildNumber: env.BUILD_NUMBER
                         )
 
-                        sh """#!/bin/sh
+                        sh """
                             if [ ${params.INDEX_BUILD} == "true" ]; then
                                 curl \
                                     -XPOST \
@@ -177,7 +177,7 @@ pipeline {
                     failBuild: false
                 )   
 
-                sh """#!/bin/sh
+                sh """
                     # ugly workaround to see the scan result in the UI
                     if [ ${params.INDEX_BUILD} == "true" ]; then
                         curl \
@@ -255,7 +255,7 @@ pipeline {
                         buildNumber: env.BUILD_NUMBER
                     )
                     
-                    sh """#!/bin/sh
+                    sh """
                         ls -l
                         apk add curl openjdk11
                         git_path=`echo ${params.MY_GIT_URL} | cut -d/ -f4,5`
@@ -284,7 +284,7 @@ pipeline {
                         buildNumber: env.BUILD_NUMBER
                     )
 
-                    sh """#!/bin/sh
+                    sh """
                         if [ ${params.INDEX_BUILD} == "true" ]; then
                             curl \
                                 -XPOST \
@@ -314,7 +314,7 @@ pipeline {
                     failBuild: false
                 )   
 
-                sh """#!/bin/sh
+                sh """
                     # ugly workaround to see the scan result in the UI
                     if [ ${params.INDEX_BUILD} == "true" ]; then
                         curl \
