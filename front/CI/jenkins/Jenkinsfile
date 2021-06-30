@@ -60,10 +60,18 @@ pipeline {
 
         booleanParam(name: 'NPM_BUILD', defaultValue: false, description: '')
         booleanParam(name: 'DOCKER_BUILD', defaultValue: false, description: '')
+
+        booleanParam(name: 'FAIL_BUILD', defaultValue: false, description: 'based on Xray scanning result')
         booleanParam(name: 'INDEX_BUILD', defaultValue: false, description: 'Should be used ONLY for the 1st run for XRAY to index a build ')
 
         string(name: 'ADM_USER', defaultValue: '', description: 'Only used if INDEX_BUILD is ticked')
         string(name: 'ADM_PASS', defaultValue: '', description: 'Only used if INDEX_BUILD is ticked')
+
+        booleanParam(name: 'JPIPE_TRIGGER', defaultValue: false, description: '')
+        string(name: 'JPIPE_URL', defaultValue: 'https://pipelines-api-yann-swampup.dev.aws.devopsacc.team/v1/projectIntegrations/4/hook', description: '')
+        string(name: 'JPIPE_PASS', defaultValue: '***', description: '')
+
+        string(name: 'MY_BUILD_NUMBER', defaultValue: '0', description: 'Only used if JPIPE_TRIGGER is ticked. If set to 0 will take the current run ID')
     }
     
     stages {
@@ -174,7 +182,7 @@ pipeline {
                     serverId: env.ART_ID,
                     buildName: env.MY_BUILD_NAME,
                     buildNumber: env.BUILD_NUMBER,
-                    failBuild: false
+                    failBuild: params.FAIL_BUILD 
                 )   
 
                 sh """#!/bin/bash
@@ -311,7 +319,7 @@ pipeline {
                     serverId: env.ART_ID,
                     buildName: env.DOCKER_BUILD_NAME,
                     buildNumber: env.BUILD_NUMBER,
-                    failBuild: false
+                    failBuild: params.FAIL_BUILD 
                 )   
 
                 sh """#!/bin/bash
@@ -354,5 +362,27 @@ pipeline {
             }
         }
 
+        stage ('Trigger JFrog Pipelines') {
+            when {
+                expression {
+                    params.JPIPE_TRIGGER
+                }
+            }        
+            steps {
+                
+                sh """#!/bin/sh
+                    bNumber=${params.MY_BUILD_NUMBER} 
+                    if [ \$bNumber = "0" ]; then bNumber=${env.BUILD_NUMBER}; fi
+                    echo \$bNumber
+
+                    curl \
+                        -XPOST \
+                        -H "authorization: ${params.JPIPE_PASS}" \
+                        -H "Content-Type: application/json" \
+                        -d '{"DockerBuildName": "'${env.DOCKER_BUILD_NAME}'", "buildNumber": "'\${bNumber}'" }' \
+                    "${params.JPIPE_URL}"
+                """
+            }
+        }  
     } // end stages
 }
