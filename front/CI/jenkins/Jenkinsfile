@@ -44,7 +44,7 @@ pipeline {
 
     parameters {
         string(name: 'MY_GIT_URL', defaultValue: 'https://github.com/cyan21/k8s-app', description: 'DO NOT ADD .git at the end')
-        string(name: 'MY_GIT_BRANCH', defaultValue: 'soleng-stg', description: '')
+        string(name: 'MY_GIT_BRANCH', defaultValue: 'demo', description: '')
         string(name: 'SRC_PATH', defaultValue: 'front', description: '')
 
         string(name: 'JPD_URL', defaultValue: 'yann-swampup.dev.aws.devopsacc.team', description: 'DO NOT ADD PROTOCOL')
