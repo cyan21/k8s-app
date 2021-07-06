@@ -47,7 +47,7 @@ pipeline {
         string(name: 'MY_GIT_BRANCH', defaultValue: 'soleng-stg', description: '')
         string(name: 'SRC_PATH', defaultValue: 'front', description: '')
 
-        string(name: 'JPD_URL', defaultValue: 'yann-swampup.dev.aws.devopsacc.team', description: 'DO NOT ADD PROTOCOL')
+        string(name: 'JPD_URL', defaultValue: 'platform-us.staging.gcp.devopsacc.team', description: 'DO NOT ADD PROTOCOL')
 
         string(name: 'NPM_REPO', defaultValue: 'urs-npm', description: '')
         string(name: 'GENERIC_REPO', defaultValue: 'urs-generic', description: '')
@@ -69,7 +69,7 @@ pipeline {
         string(name: 'ADM_PASS', defaultValue: '', description: 'Only used if INDEX_BUILD is ticked')
 
         booleanParam(name: 'JPIPE_TRIGGER', defaultValue: false, description: '')
-        string(name: 'JPIPE_URL', defaultValue: 'https://pipelines-api-yann-swampup.dev.aws.devopsacc.team/v1/projectIntegrations/4/hook', description: '')
+        string(name: 'JPIPE_URL', defaultValue: 'https://pipelines-api-us.staging.gcp.devopsacc.team/v1/projectIntegrations/36/hook', description: '')
         string(name: 'JPIPE_PASS', defaultValue: '***', description: '')
 
         string(name: 'MY_BUILD_NUMBER', defaultValue: '0', description: 'Only used if JPIPE_TRIGGER is ticked. If set to 0 will take the current run ID')
