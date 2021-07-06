@@ -56,7 +56,8 @@ pipeline {
         string(name: 'DOCKER_REPO', defaultValue: 'urs-docker', description: '')
         string(name: 'DOCKER_PROMOTE', defaultValue: 'urs-docker-release-local', description: 'HAS TO BE A LOCAL REPO')
 
-        string(name: 'NEW_VERSION', defaultValue: '1.4.1', description: '')
+        string(name: 'APP_NAME', defaultValue: 'monkey', description: 'will be added as metadata on built artifacts as app.name')
+        string(name: 'NEW_VERSION', defaultValue: '1.4.1', description: 'will be added as metadata on built artifacts as app.name')
 
         booleanParam(name: 'NPM_BUILD', defaultValue: false, description: '')
         booleanParam(name: 'DOCKER_BUILD', defaultValue: false, description: '')
@@ -145,6 +146,23 @@ pipeline {
                             buildNumber: env.BUILD_NUMBER
                         )
 
+                        rtSetProps (
+                            serverId: env.ART_ID,
+                            spec: """{
+                                    \"files\": [
+                                    {
+                                        \"aql\": {
+                                            \"items.find\": {
+                                                \"repo\":\"${params.GENERIC_REPO}\",
+                                                \"@build.name\": \"${env.MY_BUILD_NAME}\",
+                                                \"@build.number\": \"${env.BUILD_NUMBER}\"
+                                            }
+                                        }                          
+                                    }
+                                    ]
+                            }""",
+                            props: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}"
+                        )
 
                         rtPublishBuildInfo (
                             serverId: env.ART_ID,
@@ -280,8 +298,7 @@ pipeline {
                         serverId: env.ART_ID,
                         image: "${params.JPD_URL}/${params.DOCKER_REPO}/jenkins-js-webapp:${params.NEW_VERSION}",
                         targetRepo: env.DOCKER_REPO,
-                        properties: 'project-name=uranus;status=stable',
-                        // If the build name and build number are not set here, the current job name and number will be used:
+                        properties: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}"
                         buildName: env.DOCKER_BUILD_NAME,
                         buildNumber: env.BUILD_NUMBER
                     )
@@ -379,7 +396,7 @@ pipeline {
                         -XPOST \
                         -H "authorization: ${params.JPIPE_PASS}" \
                         -H "Content-Type: application/json" \
-                        -d '{"DockerBuildName": "'${env.DOCKER_BUILD_NAME}'", "buildNumber": "'\${bNumber}'" }' \
+                        -d '{"DockerBuildName": "'${env.DOCKER_BUILD_NAME}'", "buildNumber": "'\${bNumber}'", "appName": "'${params.APP_NAME}'", "appVersion":"'${params.NEW_VERSION}'"}' \
                     "${params.JPIPE_URL}"
                 """
             }
