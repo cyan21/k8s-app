@@ -298,7 +298,7 @@ pipeline {
                         serverId: env.ART_ID,
                         image: "${params.JPD_URL}/${params.DOCKER_REPO}/jenkins-js-webapp:${params.NEW_VERSION}",
                         targetRepo: env.DOCKER_REPO,
-                        properties: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}"
+                        properties: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}",
                         buildName: env.DOCKER_BUILD_NAME,
                         buildNumber: env.BUILD_NUMBER
                     )
