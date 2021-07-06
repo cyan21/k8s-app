@@ -1,19 +1,19 @@
 replicaCount: 1
 
 imagePullSecrets:
-  - name: avengers-registry
-  - name: kaizoku-registry
+  - name: backend-registry-jupiter
+  - name: frontend-registry-mars
 
 nameOverride: ""
 fullnameOverride: ""
 
 images:
   front:
-    repository: avengers-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team/frontapp-js
+    repository: platform-us.staging.gcp.devopsacc.team/mrs-docker/frontapp-js
     tag: "0.1.0" 
     pullPolicy: IfNotPresent
   back:
-    repository: kaizoku-docker.artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team/backapp-gradle
+    repository: platform-us.staging.gcp.devopsacc.team/jpt-docker/backapp-gradle
     tag: "1.1.2"
     pullPolicy: IfNotPresent
 

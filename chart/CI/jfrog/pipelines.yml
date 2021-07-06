@@ -188,12 +188,6 @@ pipelines:
           integrations:
             - name: {{ .Values.Init.artifactoryIntegration }}
         execution:
-          # onStart:
-          #   - sudo mkdir -p /etc/docker 
-          #   - > 
-          #     sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.Init.container.registry }}\"]}" > /etc/docker/daemon.json
-          #   - sudo systemctl restart docker
-          #   - sudo cat /etc/docker/daemon.json
           onExecute:
             - cd ${res_{{ .Values.InitResources.gitRepo.name }}_resourcePath}/chart/CI/jfrog
             - ls -l && chmod +x init.sh
@@ -202,7 +196,7 @@ pipelines:
 #            - git checkout ${res_{{ .Values.InitResources.gitRepo.name }}_branchName}
             - git checkout demo
             - git branch
-            - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url%/artifactory} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey}
+            - ./init.sh -u  ${int_{{ .Values.Init.artifactoryIntegration }}_url%/artifactory} -p ${int_{{ .Values.Init.artifactoryIntegration }}_apikey} -l ${int_{{ .Values.Init.artifactoryIntegration }}_user}
       
       - name: {{ .Values.InitSteps.publishHelm.name }}
         type: HelmPublish
@@ -221,41 +215,41 @@ pipelines:
           outputResources:
             - name: {{ .Values.InitResources.chart.resourceName }}
             - name: {{ .Values.InitResources.buildInfoContainer.resourceName }}
-        execution:
-          onStart:
-            - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
-            - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
-            - helm3 version
-            - cat ${res_{{ .Values.InitResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
+        # execution:
+        #   onStart:
+        #     - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
+        #     - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
+        #     - helm3 version
+        #     - cat ${res_{{ .Values.InitResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
 
-      - name: {{ .Values.InitSteps.dockerBuild.name }}
-        type: DockerBuild
-        configuration:
-          affinityGroup: helm
-          dockerFileName: {{ .Values.InitSteps.dockerBuild.dockerFileName }}
-          dockerFileLocation: {{ .Values.InitSteps.dockerBuild.dockerFileLocation }}
-          dockerImageName: "{{ .Values.Init.container.registry }}/{{ .Values.Init.container.image }}"
-          dockerImageTag: {{ .Values.Init.container.tag }}
-          inputSteps:
-            - name: {{ .Values.InitSteps.publishHelm.name }}
-          inputResources:
-            - name: {{ .Values.InitResources.gitRepoDocker.name }}
-          integrations:
-            - name: {{ .Values.Init.artifactoryIntegration }}
+      # - name: {{ .Values.InitSteps.dockerBuild.name }}
+      #   type: DockerBuild
+      #   configuration:
+      #     affinityGroup: helm
+      #     dockerFileName: {{ .Values.InitSteps.dockerBuild.dockerFileName }}
+      #     dockerFileLocation: {{ .Values.InitSteps.dockerBuild.dockerFileLocation }}
+      #     dockerImageName: "{{ .Values.Init.container.registry }}/{{ .Values.Init.container.image }}"
+      #     dockerImageTag: {{ .Values.Init.container.tag }}
+      #     inputSteps:
+      #       - name: {{ .Values.InitSteps.publishHelm.name }}
+      #     inputResources:
+      #       - name: {{ .Values.InitResources.gitRepoDocker.name }}
+      #     integrations:
+      #       - name: {{ .Values.Init.artifactoryIntegration }}
 
-      - name: {{ .Values.InitSteps.dockerPush.name }}
-        type: DockerPush
-        configuration:
-          affinityGroup: helm
-          targetRepository: {{ .Values.Init.container.repoSource }}
-          autoPublishBuildInfo:  {{ .Values.InitSteps.dockerPush.autoPublishBuildInfo }}
-          forceXrayScan:  {{ .Values.InitSteps.dockerPush.forceXrayScan }}
-          inputSteps:
-            - name: {{ .Values.InitSteps.dockerBuild.name }}
-          integrations:
-            - name: {{ .Values.Init.artifactoryIntegration }}
-          outputResources:
-            - name: {{ .Values.InitResources.buildInfoHelm.resourceName }}
+      # - name: {{ .Values.InitSteps.dockerPush.name }}
+      #   type: DockerPush
+      #   configuration:
+      #     affinityGroup: helm
+      #     targetRepository: {{ .Values.Init.container.repoSource }}
+      #     autoPublishBuildInfo:  {{ .Values.InitSteps.dockerPush.autoPublishBuildInfo }}
+      #     forceXrayScan:  {{ .Values.InitSteps.dockerPush.forceXrayScan }}
+      #     inputSteps:
+      #       - name: {{ .Values.InitSteps.dockerBuild.name }}
+      #     integrations:
+      #       - name: {{ .Values.Init.artifactoryIntegration }}
+      #     outputResources:
+      #       - name: {{ .Values.InitResources.buildInfoHelm.resourceName }}
 
 ## HELM PIPELINE
   - name: {{ .Values.Chart.pipelineName }}
@@ -281,18 +275,18 @@ pipelines:
             - sudo curl -LO https://github.com/mikefarah/yq/releases/download/v4.4.0/yq_linux_amd64
             - sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq && sudo yq --version
             # FRONT 
-            - front_repo_path=`yq eval '.images.front.repository' values.yaml  |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
-            - front_img_name=`yq eval '.images.front.repository' values.yaml  |  sed "s/.*.*\/\(.*\)/\1/g"`
-            - echo $front_img_name
+            - front_repo_path=`yq eval '.images.front.repository' values.yaml  |  cut -d "/" -f2` && echo $front_repo_path
+            - front_img_name=`yq eval '.images.front.repository' values.yaml  |  sed "s/.*.*\/\(.*\)/\1/g"` && echo $front_img_name
             - front_vers=`yq eval '.images.front.tag' values.yaml` && echo $front_vers
             # BACK
-            - back_repo_path=`yq eval '.images.back.repository' values.yaml  |  sed "s/\([a-z]*-[a-z]*\).*\/\(.*\)/\1\/\2/g"`
-            - back_img_name=`yq eval '.images.back.repository' values.yaml  |  sed "s/.*.*\/\(.*\)/\1/g"`
-            - echo $back_img_name
+            - back_repo_path=`yq eval '.images.back.repository' values.yaml  |  cut -d "/" -f2` && echo $back_repo_path
+            - back_img_name=`yq eval '.images.back.repository' values.yaml  |  sed "s/.*.*\/\(.*\)/\1/g"` && echo $back_img_name
             - back_vers=`yq eval '.images.back.tag' values.yaml` && echo $back_vers
             # for FileSpec resources
-            - add_run_variables runVarFrontManifest=${front_repo_path}/${front_vers}/manifest.json
-            - add_run_variables runVarBackManifest=${back_repo_path}/${back_vers}/manifest.json
+            - add_run_variables runVarFrontManifest=${front_repo_path}/${front_img_name}/${front_vers}/manifest.json
+            - add_run_variables runVarBackManifest=${back_repo_path}/${back_img_name}/${back_vers}/manifest.json
+            - echo $runVarFrontManifest
+            - echo $runVarBackManifest
             # for adding properties on the Helm Chart
             - add_run_variables runVarFrontImage=${front_img_name}/${front_vers}
             - add_run_variables runVarBackImage=${back_img_name}/${back_vers}
@@ -322,9 +316,9 @@ pipelines:
           onStart:
             - echo ${runVarFrontManifest}
             - echo ${runVarBackManifest}
-            - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
-            - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
-            - helm3 version
+            # - curl  https://get.helm.sh/helm-canary-linux-amd64.tar.gz | tar xvz -C /tmp
+            # - mv /tmp/linux-amd64/helm /usr/local/bin/helm3
+            # - helm3 version
             - cat ${res_{{ .Values.ChartResources.gitRepoHelm.name }}_resourcePath}/chart/CI/jfrog/Dockerfile
             - export JFROG_CLI_BUILD_URL="${int_{{ .Values.Chart.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.ChartResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.ChartResources.gitRepoHelm.name }}_branchName}"
  ############################################################################################
@@ -340,15 +334,15 @@ pipelines:
           environmentVariables:
             JFROG_CLI_LOG_LEVEL: DEBUG
           helmVersion: 3
-          # WORKAROUND TO MAKE HELM 3 WORK : SHOULD BE REMOVED IN THE LATEST VERSIONS
-          runtime:
-            type: image
-            image:
-              custom:
-                registry: {{ .Values.Chart.artifactoryIntegration }}
-                name: "{{ .Values.Chart.container.registry }}/{{ .Values.Chart.container.image }}"
-                tag: {{ .Values.Chart.container.tag }}
-                sourceRepository: {{ .Values.Chart.container.repoSource }}
+          # # WORKAROUND TO MAKE HELM 3 WORK : SHOULD BE REMOVED IN THE LATEST VERSIONS
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.Chart.artifactoryIntegration }}
+          #       name: "{{ .Values.Chart.container.registry }}/{{ .Values.Chart.container.image }}"
+          #       tag: {{ .Values.Chart.container.tag }}
+          #       sourceRepository: {{ .Values.Chart.container.repoSource }}
           integrations:
             - name: {{ .Values.Chart.k8sIntegration }}
           inputResources:
@@ -394,9 +388,9 @@ pipelines:
 #            - echo  "jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz \"image.back=${runVarBackImage};image.front=${runVarFrontImage}\""
 #            - jfrog rt sp --build={{ .Values.ChartResources.buildInfo.name }}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
           # WORKAROUND FOR BUG 
-            - jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
-            - jfrog rt sp ${runVarFrontManifest} "validation.chart.version={{ .Values.Chart.version }}" 
-            - jfrog rt sp ${runVarBackManifest} "validation.chart.version={{ .Values.Chart.version }}" 
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.Chart.repoPromotion1 }}/{{ .Values.Chart.name }}-{{ .Values.Chart.version }}.tgz "image.back=${runVarBackImage};image.front=${runVarFrontImage}"
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp ${runVarFrontManifest} "validation.chart.version={{ .Values.Chart.version }}" 
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp ${runVarBackManifest} "validation.chart.version={{ .Values.Chart.version }}" 
 
       - name: {{ .Values.ChartSteps.initRB.name }}
         type: CreateReleaseBundle 

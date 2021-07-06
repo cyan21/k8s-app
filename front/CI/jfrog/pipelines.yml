@@ -97,6 +97,20 @@ pipelines:
         type: NpmBuild
         configuration:
           # npmArgs: {{ .Values.FrontAppJSSteps.npmBuild.args }}
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
+          #       name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
+          #       tag: 12.18.2-ych
+          #       sourceRepository: mrs-docker
+          environmentVariables:
+            OFFLINE_MODE: "true"
+            JFROG_CLI_BUILD_URL: "${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
+            JFROG_CLI_BUILD_NAME: "${pipeline_name}"
+            JFROG_CLI_BUILD_NUMBER: "${run_number}"
+            JFROG_CLI_TEMP_DIR: "/tmp" 
           affinityGroup: together
           repositoryName: {{ .Values.FrontApp.js.repoNpmSource }}
           sourceLocation: {{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}
@@ -109,6 +123,7 @@ pipelines:
             # retrieved cached dependencies (stored onSucess execution)            
 #            - restore_cache_files npm_cache ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/node_modules
           onSuccess:
+            # - jfrog --version
             - add_run_variables runVarAppVersion=`jq -r ".version" ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }}/package.json`
             - echo $runVarAppVersion
             - add_run_variables runVarGitCommit=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_commitSha}
@@ -117,14 +132,29 @@ pipelines:
             # pass front folder to next step
             - add_run_files  ${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_resourcePath}/{{ .Values.FrontAppJSSteps.npmBuild.sourceLocation }} mySources            
             # pass JFrog CLI tmp folder to next step
-            - add_run_files  /tmp/jfrog  jfrogCLI_tmp
+#            - add_run_files  /tmp/jfrog  jfrogCLI_tmp
+            # - apt install tree -y
+            # - tree /tmp/jfrog
+            # - env | grep JFROG_CLI
 
       - name: {{ .Values.FrontAppJSSteps.packageAndPublish.name }}
         type: Bash
         configuration:
           affinityGroup: together
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
+          #       name: platform-us.staging.gcp.devopsacc.team/mrs-docker/pipelines-u18node
+          #       tag: 12.18.2-ych
+          #       sourceRepository: mrs-docker
           environmentVariables:
             OFFLINE_MODE: "true"
+            JFROG_CLI_BUILD_URL: "${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
+            JFROG_CLI_BUILD_NAME: "${pipeline_name}"
+            JFROG_CLI_BUILD_NUMBER: "${run_number}"
+            JFROG_CLI_TEMP_DIR: "/tmp" 
           inputSteps:
             - name: {{ .Values.FrontAppJSSteps.npmBuild.name }}
           integrations:
@@ -133,21 +163,30 @@ pipelines:
             - name: {{ .Values.FrontAppNpmResources.buildInfo.resourceName }}
         execution:
           onStart:
-            - restore_run_files mySources .
-            - mkdir /tmp/jfrog 
-            - restore_run_files jfrogCLI_tmp /tmp/jfrog/
+            - env | grep JFROG_CLI
+            - /var/opt/jfrog/pipelines/jfrog/jfrog --version
+            # - jfrog --version
+            - restore_run_files npmBuildInputGitRepo .
+            # - ls -l 
+            - cd front/
+            - restore_run_files jfrog /tmp/jfrog
             - ls -l /tmp/jfrog/
+            # - restore_run_files mySources .
+            # - ls -l 
+#            - mkdir /tmp/jfrog 
+#            - restore_run_files jfrogCLI_tmp /tmp/jfrog/
+#            - ls -l /tmp/jfrog/
             - npm run build
           onExecute:
+            - env | grep JFROG_CLI
             - echo "Run Unit Testing ..." 
             - if [ $OFFLINE_MODE == "true" ]; then echo "Offline mode turned on";fi
           onSuccess:
-            - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number}/setup_env?branch=${res_{{ .Values.FrontAppNpmResources.gitRepo.name }}_branchName}"
             - tar -czvf {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz build/
-            - jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ --build-name={{ .Values.FrontAppNpmResources.buildInfo.name }} --build-number=${run_number}
-            - jfrog rt bce {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
-            - jfrog rt bp {{ .Values.FrontAppNpmResources.buildInfo.name }} ${run_number}
-            - jfrog rt sp --build={{ .Values.FrontAppNpmResources.buildInfo.name }}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt u {{ .Values.FrontApp.appName }}-${runVarAppVersion}.tar.gz {{ .Values.FrontApp.js.repoSource }}/ 
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt bce   
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt bp   
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp --build=${pipeline_name}/${run_number} {{ .Values.FrontApp.js.repoSource }}/ "src.commit.sha=${runVarGitCommit};app.version=${runVarAppVersion};app.name={{ .Values.FrontApp.projectName }}"
 
       - name: {{ .Values.FrontAppJSSteps.xray.name }}
         type: XrayScan
@@ -194,11 +233,6 @@ pipelines:
             - name: {{ .Values.FrontAppNpmResources.propertyBag.name }}
         execution:
           onExecute:
-            - sudo mkdir -p /etc/docker 
-            - > 
-              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.FrontApp.container.registry }}\"]}" > /etc/docker/daemon.json
-            - sudo systemctl restart docker
-            - sudo cat /etc/docker/daemon.json
             - add_run_variables runVarAppVersion=${res_{{ .Values.FrontAppNpmResources.propertyBag.name }}_appVersion}
             - add_run_variables runVarAppCommitSHA=${res_{{ .Values.FrontAppNpmResources.propertyBag.name }}_appCommitSHA}
 
@@ -244,7 +278,7 @@ pipelines:
             - export JFROG_CLI_BUILD_URL="${int_{{ .Values.FrontApp.artifactoryIntegration }}_url/%artifactory/ui}/pipelines/myPipelines/{{ .Values.FrontAppContainerResources.buildInfo.name }}/${run_number}/setup_env?branch=${runBranchName}"
           onSuccess:
             - echo "{{ .Values.FrontApp.container.repoSource }}/${envVarAppName}/${runVarAppVersion}/manifest.json"
-            - jfrog rt sp --build=${res_{{ .Values.FrontAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.FrontApp.container.repoSource }}/{{ .Values.FrontApp.container.image }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp --build=${res_{{ .Values.FrontAppContainerResources.buildInfo.resourceName }}_buildName}/${run_number} {{ .Values.FrontApp.container.repoSource }}/{{ .Values.FrontApp.container.image }}/${runVarAppVersion}/manifest.json "app.version=${runVarAppVersion};app.commit.sha=${runVarAppCommitSHA};dockerfile.commit.sha=${runVarGitCommit}"
 
       - name: {{ .Values.FrontAppContainerSteps.xray.name }}
         type: XrayScan
@@ -290,12 +324,6 @@ pipelines:
             - name: {{ .Values.FrontAppContainerResources.propertyBag.name }}
         execution:
           onExecute:
-            - sudo mkdir -p /etc/docker 
-            - > 
-              sudo jq -n  "{\"insecure-registries\": [\"{{ .Values.FrontApp.container.registry }}\"]}" > /etc/docker/daemon.json
-            - sudo systemctl restart docker
-            - sudo cat /etc/docker/daemon.json
-            - sudo systemctl status docker
             - echo ${res_{{ .Values.FrontAppContainerResources.propertyBag.name }}_newTag}
             - add_run_variables runVarNewTag=${res_{{ .Values.FrontAppContainerResources.propertyBag.name }}_newTag}
             - add_run_variables runVarBuildName=${res_{{ .Values.FrontAppContainerResources.propertyBag.name }}_buildInfoName}
@@ -306,14 +334,14 @@ pipelines:
         configuration:
           affinityGroup: deploy
           helmVersion: 3
-          runtime:
-            type: image
-            image:
-              custom:
-                registry: {{ .Values.FrontApp.artifactoryIntegration }}
-                name: "{{ .Values.FrontApp.container.registry }}/{{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.image }}"
-                tag: {{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.tag }}
-                sourceRepository: {{ .Values.FrontApp.container.repoSource }}
+          # runtime:
+          #   type: image
+          #   image:
+          #     custom:
+          #       registry: {{ .Values.FrontApp.artifactoryIntegration }}
+          #       name: "{{ .Values.FrontApp.container.registry }}/{{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.image }}"
+          #       tag: {{ .Values.FrontAppContainerDeploySteps.helmDeploy.container.tag }}
+          #       sourceRepository: {{ .Values.FrontApp.container.repoSource }}
           inputSteps:
             - name: setup_env
           integrations:
@@ -363,7 +391,7 @@ pipelines:
             - cat payload.json
             # escape semi colon
             - > 
-              jfrog rt curl -XPOST api/docker/{{ .Values.FrontApp.container.repoPromotion1 }}/v2/promote -H "Content-Type: application/json" -d @payload.json
+              /var/opt/jfrog/pipelines/jfrog/jfrog rt curl -XPOST api/docker/{{ .Values.FrontApp.container.repoPromotion1 }}/v2/promote -H "Content-Type: application/json" -d @payload.json
           onSuccess:
             - echo  "jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json \"validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}\""
-            - jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"
+            - /var/opt/jfrog/pipelines/jfrog/jfrog rt sp --build=${runVarBuildName}/${runVarBuildNumber} {{ .Values.FrontApp.container.repoPromotion2 }}/{{ .Values.FrontApp.container.image }}/${runVarNewTag}/manifest.json "validation.chart.name=${runVarChartName};validation.chart.version=${runVarChartVersion}"

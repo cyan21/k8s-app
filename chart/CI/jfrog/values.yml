@@ -2,14 +2,13 @@ Init:
   pipelineName: k8s_project_init
   container:
     # for Docker build
-    registry: iot-demo.gcp.devopsacc.team:80/saturn-docker
+    registry: platform-us.staging.gcp.devopsacc.team/stn-docker
     image: jfrog/pipelines-u18node
     tag: 10.21.0-jfrog
     # repoSource and repoPromotion have to be local repo (due to the JFrog CLI limitation)
-    repoSource: saturn-docker-release-local
-    # repoPromotion1: kaizoku-docker-rc-local
+    repoSource: stn-docker-release-local
   chart:
-    repo: saturn-helm
+    repo: stn-helm
     name: myapp
     version: 1.0.0
   artifactoryIntegration: artifactory_eu
@@ -20,7 +19,7 @@ InitResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: ^chart\/CI\/jfrog\/.+
   gitRepoDocker:
@@ -28,7 +27,7 @@ InitResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: ^chart\/CI\/jfrog\/Dockerfile
   gitRepoHelm:
@@ -36,7 +35,7 @@ InitResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: ^chart\/content\/.+
   buildInfoContainer:
@@ -49,7 +48,7 @@ InitResources:
     resourceName: hc_my_app
     name: myapp
     version: 1.0.0
-    repo: saturn-helm
+    repo: stn-helm
 
 InitSteps:
   publishHelm:
@@ -71,20 +70,20 @@ Chart:
   pipelineName: k8s_bump_helm_chart
   # It's either Chart + Docker OR Docker distribution (see back/CI/jfrog/pipelines/values/yml  > BackApp.distribute)
   distribute: true
-  # TO DO  : REMOVE THE CUSTOM IMAGE IN THE LATEST VERSION OF PIPELINE
-  container:
-    registry: iot-demo.gcp.devopsacc.team:80/saturn-docker
-    image: jfrog/pipelines-u18node
-    tag: 10.21.0-jfrog
-    repoSource: saturn-docker-release-local
+  # # TO DO  : REMOVE THE CUSTOM IMAGE IN THE LATEST VERSION OF PIPELINE
+  # container:
+  #   registry: iot-soleng-stg.gcp.devopsacc.team:80/stn-docker
+  #   image: jfrog/pipelines-u18node
+  #   tag: 10.21.0-jfrog
+  #   repoSource: stn-docker-release-local
   # used by the Helm Chart resource
-  repo: saturn-helm
-  repoPromotion1: saturn-helm-release-local
+  repo: stn-helm
+  repoPromotion1: stn-helm-release-local
   name: myapp
   version: 2.0.0
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
-  k8sNamespace: saturn
+  k8sNamespace: build-plane
   distributionIntegration: distribution_eu
 
 ChartResources:
@@ -93,7 +92,7 @@ ChartResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: ^chart\/content\/.+
   gitRepoHelm:
@@ -101,7 +100,7 @@ ChartResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: ^chart\/content\/.+
   chart:

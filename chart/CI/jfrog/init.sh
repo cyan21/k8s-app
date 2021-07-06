@@ -7,8 +7,8 @@ usage() {
     echo "$0 -u <JPD_URL> -l <ADMIN_USER> -p <ADMIN_PASS>"
 }
 
-JPD_URL="http://artifactory-eu-yannc3-0.soleng-emea-staging.jfrog.team"
-ADMIN_USER="admin"
+JPD_URL="https://platform-us.staging.gcp.devopsacc.team"
+ADMIN_USER="toto"
 BUILD_NAMES="k8s_backapp_gradle,k8s_backapp_gradle_docker,k8s_frontapp_js,k8s_frontapp_js_docker"  #list with comma as a separator
 
 while getopts "u:l:p:" option; do

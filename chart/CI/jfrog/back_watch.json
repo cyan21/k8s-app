@@ -9,7 +9,7 @@
         "resources": [
             {
                 "type": "repository",
-                "name": "jupiter-grdl-dev-local",
+                "name": "jpt-grdl-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -20,7 +20,7 @@
             },
             {
                 "type": "repository",
-                "name": "jupiter-grdl-rc-local",
+                "name": "jpt-grdl-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -31,7 +31,7 @@
             },
             {
                 "type": "repository",
-                "name": "jupiter-docker-dev-local",
+                "name": "jpt-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -42,7 +42,7 @@
             },
             {
                 "type": "repository",
-                "name": "jupiter-docker-rc-local",
+                "name": "jpt-docker-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -53,7 +53,7 @@
             },
             {
                 "type": "repository",
-                "name": "jupiter-docker-dev-local",
+                "name": "jpt-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -65,7 +65,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "jupiter-jcenter-grdl-remote",
+                "name": "jpt-jcenter-grdl-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -77,7 +77,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "jupiter-dockerhub-remote",
+                "name": "jpt-dockerhub-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -100,7 +100,7 @@
     },
     "assigned_policies": [
         {
-            "name": "global_sec",
+            "name": "production",
             "type": "security"
         }
     ]

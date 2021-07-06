@@ -1,22 +1,22 @@
 #!/bin/bash
 
-ns="kaivengers"
-sa="ironman"
+ns="build-plane"
+sa="yann-tooling"
 email="yannc@jfrog.com"
 
-backend_registry_name="kaizoku-registry"
-backend_registry_url="kaizoku-docker.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80"
-backend_registry_user="admin"
-backend_registry_pass="password"
+backend_registry_name="backend-registry-jupiter"
+backend_registry_url="platform-us.staging.gcp.devopsacc.team"
+backend_registry_user="yannc@jfrog.com"
+backend_registry_pass="%%%%%%%%%%%%"
 
-frontend_registry_name="avengers-registry"
-frontend_registry_url="avengers-docker.artifactory-eu-yannc4-0.soleng-emea-staging.jfrog.team:80"
-frontend_registry_user="admin"
-frontend_registry_pass="password"
+frontend_registry_name="front-registry-mars"
+frontend_registry_url="platform-us.staging.gcp.devopsacc.team"
+frontend_registry_user="yannc@jfrog.com"
+frontend_registry_pass="%%%%%%%%%%%"
 
 # create namespace, service account, role, role binding
 sed "s/MY_NAMESPACE/$ns/g" demo.yaml.tpl > demo.yaml
-sed -i "s/MY_SVC_ACCOUNT/$sa/g" demo.yaml
+sed -i '' "s/MY_SVC_ACCOUNT/$sa/g" demo.yaml
 
 sudo kubectl apply -f demo.yaml 
 
@@ -33,8 +33,8 @@ sudo kubectl create secret docker-registry $backend_registry_name \
 ####################
 
 # install yq
-sudo curl -LO https://github.com/mikefarah/yq/releases/download/v4.4.0/yq_linux_amd64
-sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq 
+#sudo curl -LO https://github.com/mikefarah/yq/releases/download/v4.4.0/yq_linux_amd64
+#sudo chmod u+x yq_linux_amd64 && sudo mv yq_linux_amd64 /usr/bin/yq 
 sudo yq --version
 
 # get kubeconfig  

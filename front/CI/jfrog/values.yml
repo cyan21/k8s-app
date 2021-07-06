@@ -6,17 +6,17 @@ FrontApp:
   appName: frontapp
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
-  k8sNamespace: saturn
+  k8sNamespace: build-plane
   js:
-    repoNpmSource: mars-npm
-    repoSource: mars-generic
-    repoPromotion1: mars-generic-rc-local
+    repoNpmSource: mrs-npm
+    repoSource: mrs-generic
+    repoPromotion1: mrs-generic-rc-local
   container:
-    registry: mars-docker.ot-demo.gcp.devopsacc.team:80
+    registry: platform-us.staging.gcp.devopsacc.team/mrs-docker
     image: frontapp-js
-    repoSource: mars-docker
-    repoPromotion1: mars-docker-rc-local
-    repoPromotion2: mars-docker-release-local
+    repoSource: mrs-docker
+    repoPromotion1: mrs-docker-rc-local
+    repoPromotion2: mrs-docker-release-local
 
 ##########################################
 ## NPM Pipeline
@@ -28,7 +28,7 @@ FrontAppNpmResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       exclude: '^front\/CI\/.+'
       include: '^front\/.+'
@@ -66,7 +66,7 @@ FrontAppContainerResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: '^front\/CI\/Docker\/.+'
   fileSpec:
@@ -107,21 +107,21 @@ FrontAppContainerDeployResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: '^chart\/.+'
   helmChart:
     resourceName: hc_my_app_frontapp_js
-    repo: saturn-helm
+    repo: stn-helm
     name: myapp
     version: 1.0.0
     
 FrontAppContainerDeploySteps:
   helmDeploy:
     name: deploy_helm_chart
-    container: # workaround to make Helm V3 to work
-      image: jfrog/pipelines-u18node
-      tag: 10.21.0-jfrog
+    # container: # workaround to make Helm V3 to work
+    #   image: jfrog/pipelines-u18node
+    #   tag: 10.21.0-jfrog
   testing:
     name: run_app_test
   promotion:

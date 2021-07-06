@@ -3,23 +3,23 @@ BackApp:
   pipelineContainerName: k8s_backapp_gradle_docker
   pipelineDeployName: k8s_backapp_gradle_deployment
   pipelineDistributionName: k8s_backapp_gradle_distribute
-  distribute: true
-  releaseBundleName: iot-demo
-  projectName: jupiter
+  distribute: false
+  releaseBundleName: iot-soleng-stg
+  projectName: jpt
   artifactoryIntegration: artifactory_eu
   k8sIntegration: yann_k8s
-  k8sNamespace: saturn
+  k8sNamespace: build-plane
   gradle:
-    repoSource: jupiter-grdl
-    repoPromotion1: jupiter-grdl-release-local
+    repoSource: jpt-grdl
+    repoPromotion1: jpt-grdl-release-local
   container:
     # for Docker build
-    registry: iot-demo.gcp.devopsacc.team:80/jupiter-docker
+    registry: platform-us.staging.gcp.devopsacc.team/jpt-docker
     image: backapp-gradle
     # for Docker push (which calls the JFrog CLI set props => only accept local repo)
-    repoSource: jupiter-docker-dev-local
-    repoPromotion1: jupiter-docker-rc-local
-    repoPromotion2: jupiter-docker-release-local
+    repoSource: jpt-docker-dev-local
+    repoPromotion1: jpt-docker-rc-local
+    repoPromotion2: jpt-docker-release-local
   helm:
     repoSource: saturn-helm
     repoPromotion1: saturn-helm-release-local
@@ -34,7 +34,7 @@ BackAppGradleResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       exclude: '^back\/CI\/.+'
       include: '^back\/.+'
@@ -74,7 +74,7 @@ BackAppContainerResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: '^back\/CI\/Docker\/.+'
   fileSpec:
@@ -116,12 +116,12 @@ BackAppContainerDeployResources:
     gitProvider: yann_github
     path: cyan21/k8s-app
     branches:
-      include: demo
+      include: soleng-stg
     files:
       include: '^chart\/.+'
   helmChart:
     resourceName: hc_my_app_backapp_gradle
-    repo: saturn-helm
+    repo: stn-helm
     name: myapp
     version: 1.0.0
   propertyBag: 
@@ -130,9 +130,9 @@ BackAppContainerDeployResources:
 BackAppContainerDeploySteps:
   helmDeploy:
     name: deploy_helm_chart
-    container: # workaround to make Helm V3 to work
-      image: jfrog/pipelines-u18node
-      tag: 10.21.0-jfrog
+    # container: # workaround to make Helm V3 to work
+    #   image: jfrog/pipelines-u18node
+    #   tag: 10.21.0-jfrog
   testing:
     name: run_app_test
   promotion:

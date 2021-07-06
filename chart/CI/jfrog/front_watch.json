@@ -8,7 +8,7 @@
         "resources": [
             {
                 "type": "repository",
-                "name": "mars-npm-dev-local",
+                "name": "mrs-npm-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -19,7 +19,7 @@
             },
             {
                 "type": "repository",
-                "name": "mars-npm-rc-local",
+                "name": "mrs-npm-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -30,7 +30,7 @@
             },
             {
                 "type": "repository",
-                "name": "mars-docker-dev-local",
+                "name": "mrs-docker-dev-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -41,7 +41,7 @@
             },
             {
                 "type": "repository",
-                "name": "mars-docker-rc-local",
+                "name": "mrs-docker-rc-local",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -53,7 +53,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "mars-npmjs-remote",
+                "name": "mrs-npmjs-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -65,7 +65,7 @@
             {
                 "type": "repository",
                 "repo_type": "remote",
-                "name": "mars-dockerhub-remote",
+                "name": "mrs-dockerhub-remote",
                 "bin_mgr_id": "unused",
                 "filters": [
                     {
@@ -88,7 +88,7 @@
     },
     "assigned_policies": [
         {
-            "name": "global_sec",
+            "name": "production",
             "type": "security"
         }
     ]
