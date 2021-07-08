@@ -57,7 +57,7 @@ pipeline {
 
         string(name: 'DOCKER_REPO', defaultValue: 'urs-docker', description: '')
         string(name: 'DOCKER_PROMOTE', defaultValue: 'urs-docker-release-local', description: 'HAS TO BE A LOCAL REPO')
-        booleanParam(name: 'DOCKER_SUB_DOMAIN', defaultValue: true, description: 'false means Docker Repo Path')
+        booleanParam(name: 'DOCKER_SUB_DOMAIN', defaultValue: false, description: 'false means Docker Repo Path')
 
         string(name: 'APP_NAME', defaultValue: 'monkey', description: 'will be added as metadata on built artifacts as app.name')
         string(name: 'NEW_VERSION', defaultValue: '1.4.1', description: 'will be added as metadata on built artifacts as app.name')
