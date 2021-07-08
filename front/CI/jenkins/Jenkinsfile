@@ -40,6 +40,8 @@ pipeline {
         ART_ID='artifactory-eu'
         MY_BUILD_NAME = 'jenkins-js'
         DOCKER_BUILD_NAME = 'jenkins-js-docker'
+        DOCKER_REGISTRY_URL=sh(returnStdout: true, script: """ if [ \"${params.DOCKER_SUB_DOMAIN}\" = \"true\" ]; then echo \"${params.DOCKER_REPO}.${params.JPD_URL}\"; else echo \"${params.JPD_URL}/${params.DOCKER_REPO}\"; fi""").trim()
+
     }
 
     parameters {
@@ -55,6 +57,7 @@ pipeline {
 
         string(name: 'DOCKER_REPO', defaultValue: 'urs-docker', description: '')
         string(name: 'DOCKER_PROMOTE', defaultValue: 'urs-docker-release-local', description: 'HAS TO BE A LOCAL REPO')
+        booleanParam(name: 'DOCKER_SUB_DOMAIN', defaultValue: true, description: 'false means Docker Repo Path')
 
         string(name: 'APP_NAME', defaultValue: 'monkey', description: 'will be added as metadata on built artifacts as app.name')
         string(name: 'NEW_VERSION', defaultValue: '1.4.1', description: 'will be added as metadata on built artifacts as app.name')
@@ -289,14 +292,14 @@ pipeline {
                         echo https://raw.githubusercontent.com/\${git_path}/${params.MY_GIT_BRANCH}/${params.SRC_PATH}/CI/Docker/Dockerfile
                         curl -O https://raw.githubusercontent.com/\${git_path}/${params.MY_GIT_BRANCH}/${params.SRC_PATH}/CI/Docker/Dockerfile
                         cat Dockerfile
-                        docker login -u ${ARTY_CREDS_USR} -p ${ARTY_CREDS_PSW} ${params.JPD_URL}
+                        docker login -u ${ARTY_CREDS_USR} -p ${ARTY_CREDS_PSW} ${env.DOCKER_REGISTRY_URL}
                         ls -l 
-                        docker build -t ${params.JPD_URL}/${params.DOCKER_REPO}/jenkins-js-webapp:${params.NEW_VERSION} .
+                        docker build -t ${env.DOCKER_REGISTRY_URL}/jenkins-js-webapp:${params.NEW_VERSION} .
                     """
                 
                     rtDockerPush(
                         serverId: env.ART_ID,
-                        image: "${params.JPD_URL}/${params.DOCKER_REPO}/jenkins-js-webapp:${params.NEW_VERSION}",
+                        image: "${env.DOCKER_REGISTRY_URL}/jenkins-js-webapp:${params.NEW_VERSION}",
                         targetRepo: env.DOCKER_REPO,
                         properties: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}",
                         buildName: env.DOCKER_BUILD_NAME,
