@@ -40,21 +40,24 @@ pipeline {
         ART_ID='artifactory-eu'
         MY_BUILD_NAME = 'jenkins-js'
         DOCKER_BUILD_NAME = 'jenkins-js-docker'
+        DOCKER_REGISTRY_URL=sh(returnStdout: true, script: """ if [ \"${params.DOCKER_SUB_DOMAIN}\" = \"true\" ]; then echo \"${params.DOCKER_REPO}.${params.JPD_URL}\"; else echo \"${params.JPD_URL}/${params.DOCKER_REPO}\"; fi""").trim()
+
     }
 
     parameters {
         string(name: 'MY_GIT_URL', defaultValue: 'https://github.com/cyan21/k8s-app', description: 'DO NOT ADD .git at the end')
-        string(name: 'MY_GIT_BRANCH', defaultValue: 'demo', description: '')
+        string(name: 'MY_GIT_BRANCH', defaultValue: 'soleng-stg', description: '')
         string(name: 'SRC_PATH', defaultValue: 'front', description: '')
 
-        string(name: 'JPD_URL', defaultValue: 'yann-swampup.dev.aws.devopsacc.team', description: 'DO NOT ADD PROTOCOL')
-
+        string(name: 'JPD_URL', defaultValue: '', description: 'DO NOT ADD PROTOCOL')
+      
         string(name: 'NPM_REPO', defaultValue: 'urs-npm', description: '')
         string(name: 'GENERIC_REPO', defaultValue: 'urs-generic', description: '')
         string(name: 'GENERIC_PROMOTE', defaultValue: 'urs-generic-release-local', description: '')
 
         string(name: 'DOCKER_REPO', defaultValue: 'urs-docker', description: '')
         string(name: 'DOCKER_PROMOTE', defaultValue: 'urs-docker-release-local', description: 'HAS TO BE A LOCAL REPO')
+        booleanParam(name: 'DOCKER_SUB_DOMAIN', defaultValue: false, description: 'false means Docker Repo Path')
 
         string(name: 'APP_NAME', defaultValue: 'monkey', description: 'will be added as metadata on built artifacts as app.name')
         string(name: 'NEW_VERSION', defaultValue: '1.4.1', description: 'will be added as metadata on built artifacts as app.name')
@@ -69,7 +72,7 @@ pipeline {
         string(name: 'ADM_PASS', defaultValue: '', description: 'Only used if INDEX_BUILD is ticked')
 
         booleanParam(name: 'JPIPE_TRIGGER', defaultValue: false, description: '')
-        string(name: 'JPIPE_URL', defaultValue: 'https://pipelines-api-yann-swampup.dev.aws.devopsacc.team/v1/projectIntegrations/4/hook', description: '')
+        string(name: 'JPIPE_URL', defaultValue: '', description: '')
         string(name: 'JPIPE_PASS', defaultValue: '***', description: '')
 
         string(name: 'MY_BUILD_NUMBER', defaultValue: '0', description: 'Only used if JPIPE_TRIGGER is ticked. If set to 0 will take the current run ID')
@@ -289,14 +292,16 @@ pipeline {
                         echo https://raw.githubusercontent.com/\${git_path}/${params.MY_GIT_BRANCH}/${params.SRC_PATH}/CI/Docker/Dockerfile
                         curl -O https://raw.githubusercontent.com/\${git_path}/${params.MY_GIT_BRANCH}/${params.SRC_PATH}/CI/Docker/Dockerfile
                         cat Dockerfile
-                        docker login -u ${ARTY_CREDS_USR} -p ${ARTY_CREDS_PSW} ${params.JPD_URL}
+
+                        docker login -u ${ARTY_CREDS_USR} -p ${ARTY_CREDS_PSW} ${env.DOCKER_REGISTRY_URL}
                         ls -l 
-                        docker build -t ${params.JPD_URL}/${params.DOCKER_REPO}/jenkins-js-webapp:${params.NEW_VERSION} .
+                        docker build -t ${env.DOCKER_REGISTRY_URL}/jenkins-js-webapp:${params.NEW_VERSION} .
+
                     """
                 
                     rtDockerPush(
                         serverId: env.ART_ID,
-                        image: "${params.JPD_URL}/${params.DOCKER_REPO}/jenkins-js-webapp:${params.NEW_VERSION}",
+                        image: "${env.DOCKER_REGISTRY_URL}/jenkins-js-webapp:${params.NEW_VERSION}",
                         targetRepo: env.DOCKER_REPO,
                         properties: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}",
                         buildName: env.DOCKER_BUILD_NAME,
