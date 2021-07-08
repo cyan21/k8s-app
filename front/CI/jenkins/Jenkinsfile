@@ -50,7 +50,7 @@ pipeline {
         string(name: 'SRC_PATH', defaultValue: 'front', description: '')
 
         string(name: 'JPD_URL', defaultValue: '', description: 'DO NOT ADD PROTOCOL')
-
+      
         string(name: 'NPM_REPO', defaultValue: 'urs-npm', description: '')
         string(name: 'GENERIC_REPO', defaultValue: 'urs-generic', description: '')
         string(name: 'GENERIC_PROMOTE', defaultValue: 'urs-generic-release-local', description: '')
@@ -292,9 +292,11 @@ pipeline {
                         echo https://raw.githubusercontent.com/\${git_path}/${params.MY_GIT_BRANCH}/${params.SRC_PATH}/CI/Docker/Dockerfile
                         curl -O https://raw.githubusercontent.com/\${git_path}/${params.MY_GIT_BRANCH}/${params.SRC_PATH}/CI/Docker/Dockerfile
                         cat Dockerfile
+
                         docker login -u ${ARTY_CREDS_USR} -p ${ARTY_CREDS_PSW} ${env.DOCKER_REGISTRY_URL}
                         ls -l 
                         docker build -t ${env.DOCKER_REGISTRY_URL}/jenkins-js-webapp:${params.NEW_VERSION} .
+
                     """
                 
                     rtDockerPush(
