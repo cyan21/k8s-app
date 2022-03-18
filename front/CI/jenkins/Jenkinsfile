@@ -93,8 +93,8 @@ pipeline {
                     //git branch: params.MY_GIT_BRANCH , url: params.MY_GIT_URL
                     
                     sh """#!/bin/sh
-                            apk add git curl openjdk11 jq
-                            sh "git clone ${params.MY_GIT_URL} -b ${params.MY_GIT_URL}" 
+                        apk add git curl openjdk11 jq
+                        sh "git clone ${params.MY_GIT_URL} -b ${params.MY_GIT_BRANCH}" 
                     """
 
                     dir (params.SRC_PATH ) {
