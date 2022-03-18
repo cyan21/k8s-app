@@ -94,7 +94,7 @@ pipeline {
                     
                     sh """#!/bin/sh
                         apk add git curl openjdk11 jq
-                        sh "git clone ${params.MY_GIT_URL} -b ${params.MY_GIT_BRANCH}" 
+                        git clone ${params.MY_GIT_URL} -b ${params.MY_GIT_BRANCH}
                     """
 
                     dir (params.SRC_PATH ) {
