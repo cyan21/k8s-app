@@ -89,8 +89,10 @@ pipeline {
             steps {
                 container('npm') {
                      
-                    git branch: params.MY_GIT_BRANCH , url: params.MY_GIT_URL
+                    //git branch: params.MY_GIT_BRANCH , url: params.MY_GIT_URL
                     
+                    sh "git clone ${params.MY_GIT_URL} -b ${params.MY_GIT_URL}" 
+
                     dir (params.SRC_PATH ) {
 
                         sh """#!/bin/sh
