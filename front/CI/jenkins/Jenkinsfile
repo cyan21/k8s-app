@@ -88,15 +88,18 @@ pipeline {
             }
             steps {
                 container('npm') {
-                     
+                    
+                    // BUG : https://issues.jenkins.io/browse/JENKINS-30600 
                     //git branch: params.MY_GIT_BRANCH , url: params.MY_GIT_URL
                     
-                    sh "git clone ${params.MY_GIT_URL} -b ${params.MY_GIT_URL}" 
+                    sh """#!/bin/sh
+                            apk add git curl openjdk11 jq
+                            sh "git clone ${params.MY_GIT_URL} -b ${params.MY_GIT_URL}" 
+                    """
 
                     dir (params.SRC_PATH ) {
 
                         sh """#!/bin/sh
-                            apk add curl openjdk11 jq
                             rm -rf package-lock.json
                             ls -l
                         """
