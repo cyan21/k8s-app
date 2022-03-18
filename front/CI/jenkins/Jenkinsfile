@@ -124,7 +124,7 @@ pipeline {
                         )
     
                         rtNpmInstall (
-                            args: '--verbose',
+                            args: '--no-audit --progress=false',
                             module: 'dependencies',
                             resolverId: 'NPM_RESOLVER',
                             buildName: env.MY_BUILD_NAME,
