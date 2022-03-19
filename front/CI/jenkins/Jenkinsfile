@@ -102,8 +102,10 @@ pipeline {
                         rtServer (
                             id: env.ART_ID,
                             url: "https://${params.JPD_URL}/artifactory",
-                            credentialsId: env.ARTY_CREDS_ID
+                            username: "${ARTY_CREDS_USR}",
+                            password: "${ARTY_CREDS_PSW}",
                         )
+                            //credentialsId: env.ARTY_CREDS_ID
         
                         sh """#!/bin/sh
                             rm -rf package-lock.json
