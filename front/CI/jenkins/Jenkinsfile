@@ -135,7 +135,9 @@ pipeline {
                         )
 
                         sh """
-                            npm run build
+                            //npm run build
+                            npm start
+                            npm build
                             tar -czvf js-webapp-${params.NEW_VERSION}.tar.gz build/
                             ls -l 
                         """
