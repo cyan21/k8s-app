@@ -110,7 +110,7 @@ pipeline {
                         sh """#!/bin/sh
                             rm -rf package-lock.json
                             ls -l
-                            cat ~/.npmrc
+                            npm config ls 
                         """
 
                         rtNpmResolver (
