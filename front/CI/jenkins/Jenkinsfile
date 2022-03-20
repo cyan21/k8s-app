@@ -129,6 +129,7 @@ pipeline {
     
                         rtNpmInstall (
                             args: '--no-audit --progress=false',
+                            module: 'webapp',
                             jesolverId: 'NPM_RESOLVER',
                             buildName: env.MY_BUILD_NAME,
                             buildNumber: env.BUILD_NUMBER
