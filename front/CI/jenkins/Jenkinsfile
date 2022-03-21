@@ -316,6 +316,7 @@ pipeline {
                         properties: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}",
                         buildName: env.DOCKER_BUILD_NAME,
                         buildNumber: env.BUILD_NUMBER
+                        module: 'docker_image',
                     )
  
                     rtPublishBuildInfo (
