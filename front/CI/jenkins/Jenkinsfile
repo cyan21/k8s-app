@@ -129,6 +129,15 @@ pipeline {
                             project: params.JF_PROJECT
                         )
     
+                        rtNpmInstall (
+                            args: '--no-audit --progress=false',
+                            module: 'webapp',
+                            resolverId: 'NPM_RESOLVER',
+                            buildName: env.MY_BUILD_NAME,
+                            buildNumber: env.BUILD_NUMBER,
+                            project: params.JF_PROJECT
+                        )
+
                         // audit dependencies
                         sh """
                             curl -fL https://getcli.jfrog.io/v2-jf | sh
@@ -141,16 +150,8 @@ pipeline {
                             ./jf npmc \
 				--server-id-resolve=yann-rt \
 				--repo-resolve=${params.NPM_REPO}
-                            ./jf audit-npm
+                            ./jf audit
                         """
-                        rtNpmInstall (
-                            args: '--no-audit --progress=false',
-                            module: 'webapp',
-                            resolverId: 'NPM_RESOLVER',
-                            buildName: env.MY_BUILD_NAME,
-                            buildNumber: env.BUILD_NUMBER,
-                            project: params.JF_PROJECT
-                        )
 
                         sh """
                             env
