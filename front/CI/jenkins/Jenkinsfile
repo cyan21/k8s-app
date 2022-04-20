@@ -140,7 +140,7 @@ pipeline {
                             yann-rt
                             ./jf npmc \
 				--server-id-resolve=yann-rt \
-				--repo-resolve-releases=${params.NPM_REPO} \
+				--repo-resolve=${params.NPM_REPO} \
                             ./jf audit-npm
                         """
                         rtNpmInstall (
