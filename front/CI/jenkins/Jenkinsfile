@@ -50,14 +50,15 @@ pipeline {
         string(name: 'MY_GIT_BRANCH', defaultValue: 'demo', description: '')
         string(name: 'SRC_PATH', defaultValue: 'front', description: '')
 
-        string(name: 'JPD_URL', defaultValue: '', description: 'DO NOT ADD PROTOCOL')
+        string(name: 'JPD_URL', defaultValue: 'yann-demo.dev.gcp.devopsacc.team', description: 'DO NOT ADD PROTOCOL')
+        string(name: 'JF_PROJECT', defaultValue: 'npt', description: 'JFrog Project key')
       
-        string(name: 'NPM_REPO', defaultValue: 'urs-npm', description: '')
-        string(name: 'GENERIC_REPO', defaultValue: 'urs-generic', description: '')
-        string(name: 'GENERIC_PROMOTE', defaultValue: 'urs-generic-release-local', description: '')
+        string(name: 'NPM_REPO', defaultValue: 'npt-npm', description: '')
+        string(name: 'GENERIC_REPO', defaultValue: 'npt-generic-release-local', description: '')
+        string(name: 'GENERIC_PROMOTE', defaultValue: 'npt-generic-release-local', description: '')
 
-        string(name: 'DOCKER_REPO', defaultValue: 'urs-docker', description: '')
-        string(name: 'DOCKER_PROMOTE', defaultValue: 'urs-docker-release-local', description: 'HAS TO BE A LOCAL REPO')
+        string(name: 'DOCKER_REPO', defaultValue: 'npt-docker', description: '')
+        string(name: 'DOCKER_PROMOTE', defaultValue: 'npt-docker-release-local', description: 'HAS TO BE A LOCAL REPO')
         booleanParam(name: 'DOCKER_SUB_DOMAIN', defaultValue: false, description: 'false means Docker Repo Path')
 
         string(name: 'APP_NAME', defaultValue: 'monkey', description: 'will be added as metadata on built artifacts as app.name')
@@ -124,7 +125,8 @@ pipeline {
                             captureEnv: true,
                             excludeEnvPatterns: ['*MY_BUILD_NAME*', 'DOCKER_BUILD_NAME'],
                             buildName: env.MY_BUILD_NAME,
-                            buildNumber: env.BUILD_NUMBER
+                            buildNumber: env.BUILD_NUMBER,
+                            project: params.JF_PROJECT
                         )
     
                         rtNpmInstall (
@@ -132,7 +134,8 @@ pipeline {
                             module: 'webapp',
                             resolverId: 'NPM_RESOLVER',
                             buildName: env.MY_BUILD_NAME,
-                            buildNumber: env.BUILD_NUMBER
+                            buildNumber: env.BUILD_NUMBER,
+                            project: params.JF_PROJECT
                         )
 
                         sh """
@@ -156,7 +159,8 @@ pipeline {
                             }""",
                             module: 'webapp',
                             buildName: env.MY_BUILD_NAME,
-                            buildNumber: env.BUILD_NUMBER
+                            buildNumber: env.BUILD_NUMBER,
+                            project: params.JF_PROJECT
                         )
 
                         rtSetProps (
@@ -180,21 +184,9 @@ pipeline {
                         rtPublishBuildInfo (
                             serverId: env.ART_ID,
                             buildName: env.MY_BUILD_NAME,
-                            buildNumber: env.BUILD_NUMBER
+                            buildNumber: env.BUILD_NUMBER,
+                            project: params.JF_PROJECT
                         )
-
-                        sh """
-                            if [ ${params.INDEX_BUILD} == "true" ]; then
-                                curl \
-                                    -XPOST \
-                                    -u "${ADM_USER}:${ADM_PASS}" \
-                                    -H "Content-Type: application/json" \
-                                    -d '{"names":["'${env.MY_BUILD_NAME}'"]}' \
-                                https://${params.JPD_URL}/xray/api/v1/binMgr/builds
-                            else
-                                echo "No indexing"
-                            fi
-                        """
 
                     } // end dir
                     
@@ -244,7 +236,7 @@ pipeline {
                     serverId: env.ART_ID,
                     buildName: env.MY_BUILD_NAME,
                     buildNumber: env.BUILD_NUMBER,
-
+                    project: params.JF_PROJECT,
                     targetRepo: params.GENERIC_PROMOTE,
                     comment: 'Xray scan passed',
                     status: 'VULN_SCAN_OK',
@@ -273,7 +265,8 @@ pipeline {
                         captureEnv: true,
                         excludeEnvPatterns: ['*MY_BUILD_NAME*', 'DOCKER_BUILD_NAME'],
                         buildName: env.DOCKER_BUILD_NAME,
-                        buildNumber: env.BUILD_NUMBER
+                        buildNumber: env.BUILD_NUMBER,
+                        project: params.JF_PROJECT
                     )
                     
                     rtDownload (
@@ -291,7 +284,8 @@ pipeline {
                         failNoOp: true,
                         module: 'webapp',
                         buildName: env.DOCKER_BUILD_NAME,
-                        buildNumber: env.BUILD_NUMBER
+                        buildNumber: env.BUILD_NUMBER,
+                        project: params.JF_PROJECT
                     )
                     
                     sh """
@@ -315,61 +309,19 @@ pipeline {
                         targetRepo: env.DOCKER_REPO,
                         properties: "app.name=${params.APP_NAME};app.version=${params.NEW_VERSION}",
                         buildName: env.DOCKER_BUILD_NAME,
-                        buildNumber: env.BUILD_NUMBER
+                        buildNumber: env.BUILD_NUMBER,
+                        project: params.JF_PROJECT
                     )
  
                     rtPublishBuildInfo (
                         serverId: env.ART_ID,
                         buildName: env.DOCKER_BUILD_NAME,
-                        buildNumber: env.BUILD_NUMBER
+                        buildNumber: env.BUILD_NUMBER,
+                        project: params.JF_PROJECT
                     )
-
-                    sh """
-                        if [ ${params.INDEX_BUILD} == "true" ]; then
-                            curl \
-                                -XPOST \
-                                -u "${ADM_USER}:${ADM_PASS}" \
-                                -H "Content-Type: application/json" \
-                                -d '{"names":["'${env.DOCKER_BUILD_NAME}'"]}' \
-                            https://${params.JPD_URL}/xray/api/v1/binMgr/builds
-                        else
-                            echo "No indexing"
-                        fi
-                    """
                 }
             } // end steps
         } // end stage
-
-        stage ('Xray scan for Docker Build') {
-            when {
-                expression {
-                    params.DOCKER_BUILD
-                }
-            }
-            steps {
-                xrayScan (
-                    serverId: env.ART_ID,
-                    buildName: env.DOCKER_BUILD_NAME,
-                    buildNumber: env.BUILD_NUMBER,
-                    failBuild: params.FAIL_BUILD 
-                )   
-
-                sh """#!/bin/bash
-                    # ugly workaround to see the scan result in the UI
-                    if [ ${params.INDEX_BUILD} == "true" ]; then
-                        curl \
-                            -XPOST \
-                            -u "${ADM_USER}:${ADM_PASS}" \
-                            -H "Content-Type: application/json" \
-                            -d '{"buildName": "'${env.DOCKER_BUILD_NAME}'", "buildNumber": "'${env.BUILD_NUMBER}'" }' \
-                        https://${params.JPD_URL}/xray/api/v1/scanBuild
-                    else
-                        echo "No indexing"
-                    fi
-                """
-            }
-        }
-        
 
         stage ('Build promotion for Docker Build') {
             when {
@@ -383,7 +335,7 @@ pipeline {
                     serverId: env.ART_ID,
                     buildName: env.DOCKER_BUILD_NAME,
                     buildNumber: env.BUILD_NUMBER,
-
+                    project: params.JF_PROJECT,
                     targetRepo: params.DOCKER_PROMOTE,
                     comment: 'Xray scan passed',
                     status: 'VULN_SCAN_OK',
