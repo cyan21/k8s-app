@@ -129,6 +129,20 @@ pipeline {
                             project: params.JF_PROJECT
                         )
     
+                        // audit dependencies
+                        sh """
+                            curl -fL https://getcli.jfrog.io/v2-jf | sh
+                            ./jf --version
+                            JFROG_CLI_LEVEL=ERROR CI=true ./jf c add  \
+                                --url=https://${params.JPD_URL} \
+                                --user=${ARTY_CREDS_USR}  \
+                                --password="${ARTY_CREDS_PSW}" \
+                            yann-rt
+                            ./jf npmc \
+				--server-id-resolve=yann-rt \
+				--repo-resolve-releases=${params.NPM_REPO} \
+                            ./jf audit-npm
+                        """
                         rtNpmInstall (
                             args: '--no-audit --progress=false',
                             module: 'webapp',
@@ -194,59 +208,6 @@ pipeline {
             } // end step
         }   // end stage
         
-        stage ('Xray scan') {
-            when {
-                expression {
-                    params.NPM_BUILD
-                }
-            }
-            steps {
-                xrayScan (
-                    serverId: env.ART_ID,
-                    buildName: env.MY_BUILD_NAME,
-                    buildNumber: env.BUILD_NUMBER,
-                    failBuild: params.FAIL_BUILD 
-                )   
-
-                sh """#!/bin/bash
-                    # ugly workaround to see the scan result in the UI
-                    if [ ${params.INDEX_BUILD} == "true" ]; then
-                        curl \
-                            -XPOST \
-                            -u "${ADM_USER}:${ADM_PASS}" \
-                            -H "Content-Type: application/json" \
-                            -d '{"buildName": "'${env.MY_BUILD_NAME}'", "buildNumber": "'${env.BUILD_NUMBER}'" }' \
-                        https://${params.JPD_URL}/xray/api/v1/scanBuild
-                    else
-                        echo "No indexing"
-                    fi
-                """
-            }
-        }
-        
-
-        stage ('Build promotion') {
-            when {
-                expression {
-                    params.NPM_BUILD
-                }
-            }
-            steps {
-                rtPromote (
-                    serverId: env.ART_ID,
-                    buildName: env.MY_BUILD_NAME,
-                    buildNumber: env.BUILD_NUMBER,
-                    project: params.JF_PROJECT,
-                    targetRepo: params.GENERIC_PROMOTE,
-                    comment: 'Xray scan passed',
-                    status: 'VULN_SCAN_OK',
-                    includeDependencies: false,
-                    copy: false,
-                    failFast: false
-                )               
-            }
-        }
-
         stage ('Docker Build & Push') {
             when {
                 expression {
